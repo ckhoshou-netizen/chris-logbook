@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {cre
 const require=createRequire(import.meta.url);const FDB=require('fake-indexeddb');
 function rawState(factory){return new Promise((resolve,reject)=>{const r=factory.open('chris-logbook');r.onsuccess=()=>{const db=r.result,tx=db.transaction('records','readonly'),get=tx.objectStore('records').get('state');get.onsuccess=()=>{resolve({version:db.version,state:get.result});db.close();};get.onerror=()=>reject(get.error);};r.onerror=()=>reject(r.error);});}
 async function oldDatabase(factory,s){await new Promise((resolve,reject)=>{const r=factory.open('chris-logbook',1);r.onupgradeneeded=()=>r.result.createObjectStore('records').put(s,'state');r.onsuccess=()=>{r.result.close();resolve();};r.onerror=()=>reject(r.error);});}
-const legacy=()=>{const s=D.emptyStore();delete s.plannedEntries;delete s.exercises;s.schemaVersion=1;return s;};
+const legacy=()=>{const s=D.emptyStore();delete s.plannedEntries;delete s.exercises;delete s.weightGoals;s.schemaVersion=1;return s;};
 test('real IndexedDB transaction semantics migrate v1, retain all data, persist plans and restore backups',{concurrency:false},async()=>{
  const factory=new FDB.IDBFactory();globalThis.indexedDB=factory;globalThis.location={reload(){}};
  const old=legacy(),f=D.makeFood({name:'Cereal',quantity:40,unit:'g',calories:160,protein:4,carbs:30,fat:2});old.foods.push(f);old.entries.push(D.makeEntry(f,60,'g','2026-11-01','08:00'));old.weights.push({...D.stamp(),date:'2026-11-01',lb:132});await oldDatabase(factory,old);
@@ -18,7 +18,7 @@ test('invalid v1 migration aborts the database upgrade without altering old reco
  const factory=new FDB.IDBFactory();globalThis.indexedDB=factory;const bad=legacy();bad.weights.push({...D.stamp(),date:'not-a-date',lb:132});await oldDatabase(factory,bad);const S=await import('../app/storage.mjs?test=invalid');await assert.rejects(()=>S.readStore(),/calendar date/);const raw=await rawState(factory);assert.equal(raw.version,1);assert.deepEqual(raw.state,bad);
 });
 test('v2 database upgrade preserves food plans and persists exercise assignments and checkmarks',{concurrency:false},async()=>{
- const factory=new FDB.IDBFactory();globalThis.indexedDB=factory;globalThis.location={reload(){}};const old=D.emptyStore();delete old.exercises;old.schemaVersion=2;
+ const factory=new FDB.IDBFactory();globalThis.indexedDB=factory;globalThis.location={reload(){}};const old=D.emptyStore();delete old.exercises;delete old.weightGoals;old.schemaVersion=2;
  const f=D.makeFood({name:'Cereal',quantity:40,unit:'g',calories:160,protein:4,carbs:30,fat:2});old.foods.push(f);D.savePlannedEntry(old,D.makeEntry(f,60,'g','2026-11-04','08:00'));old.trainingSchedules.push({...D.stamp(),effective:'2026-11-01',days:[{id:'upper',weekday:1,title:'Torso A'}]});
  await new Promise((resolve,reject)=>{const r=factory.open('chris-logbook',2);r.onupgradeneeded=()=>r.result.createObjectStore('records').put(old,'state');r.onsuccess=()=>{r.result.close();resolve();};r.onerror=()=>reject(r.error);});
  const S=await import('../app/storage.mjs?test=exercises'),migrated=await S.readStore();assert.equal(migrated.schemaVersion,D.VERSION);for(const k of Object.keys(old))if(k!=='schemaVersion')assert.deepEqual(migrated[k],old[k],k);assert.equal((await rawState(factory)).version,D.VERSION);

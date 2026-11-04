@@ -1,10 +1,10 @@
-import {emptyStore,validate,clone,migrateStore} from './domain.mjs';
+import {VERSION,emptyStore,validate,clone,migrateStore} from './domain.mjs';
 const DB='chris-logbook',STORE='records';
 let connection;
 export async function openStore(){
  if(connection)return connection;
  connection=await new Promise((resolve,reject)=>{
-  const request=indexedDB.open(DB,5);
+  const request=indexedDB.open(DB,VERSION);
   let migrationError;
   request.onupgradeneeded=()=>{
    if(!request.result.objectStoreNames.contains(STORE)){request.result.createObjectStore(STORE);return;}

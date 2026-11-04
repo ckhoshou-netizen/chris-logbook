@@ -2,7 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import * as
 const food=()=>D.makeFood({name:'Cereal',quantity:40,unit:'g',calories:160,protein:4,carbs:30,fat:2});
 const planned=(s,d='2026-11-04')=>{const e=D.makeEntry(food(),60,'g',d,'08:00');D.savePlannedEntry(s,e);return e;};
 test('v1 migration adds empty new collections; every existing record and snapshot is unchanged',()=>{
- const old=D.emptyStore();delete old.plannedEntries;delete old.exercises;old.schemaVersion=1;const f=food();old.foods.push(f);old.entries.push(D.makeEntry(f,60,'g','2026-11-01','08:00'));old.weights.push({...D.stamp(),date:'2026-11-01',lb:132});old.plans.push({...D.stamp(),effective:'2026-11-01',...D.calculateTargets(1800,132),goal:{unit:'lb',value:1}});
+ const old=D.emptyStore();delete old.plannedEntries;delete old.exercises;delete old.weightGoals;old.schemaVersion=1;const f=food();old.foods.push(f);old.entries.push(D.makeEntry(f,60,'g','2026-11-01','08:00'));old.weights.push({...D.stamp(),date:'2026-11-01',lb:132});old.plans.push({...D.stamp(),effective:'2026-11-01',...D.calculateTargets(1800,132),goal:{unit:'lb',value:1}});
  // Build a real old-style snapshot without rewriting any snapshot field in migration.
  const compatible=D.migrateStore(old);old.checkins.push(D.buildCheckin(compatible,'2026-11-01'));const before=JSON.stringify(old),upgraded=D.migrateStore(old);
  assert.equal(JSON.stringify(old),before);assert.equal(upgraded.schemaVersion,D.VERSION);assert.deepEqual(upgraded.plannedEntries,[]);assert.deepEqual(upgraded.exercises,[]);for(const k of Object.keys(old))if(k!=='schemaVersion')assert.deepEqual(upgraded[k],old[k],k);assert.deepEqual(D.migrateStore(upgraded),upgraded);assert.deepEqual(D.parseBackup(before),upgraded);

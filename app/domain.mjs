@@ -1,6 +1,6 @@
 // All arithmetic uses stored precision. Display rounding belongs to the UI.
-export const VERSION = 5;
-export const TABLES = ['foods','entries','weights','statuses','plans','phases','checkins','exportedSnapshots','cardioTargets','cardioSessions','cardioCredits','trainingSchedules','trainingOccurrences','stepTargets','stepTotals','favourites','plannedEntries','exercises'];
+export const VERSION = 6;
+export const TABLES = ['foods','entries','weights','statuses','plans','phases','checkins','exportedSnapshots','cardioTargets','cardioSessions','cardioCredits','trainingSchedules','trainingOccurrences','stepTargets','stepTotals','favourites','plannedEntries','exercises','weightGoals'];
 export const NUTRIENTS = ['calories','protein','carbs','fat','fibre','sugar','sodium'];
 export const REQUIRED = ['calories','protein','carbs','fat'];
 // This is the accepted feature's first week, not a moving "current week" default.
@@ -38,9 +38,29 @@ export function migrateStore(input){
   }
   s.schemaVersion=5;
  }
+ if(s?.schemaVersion===5){assert(!Object.hasOwn(s,'weightGoals'),'Unexpected weight-goal data in a version 5 backup.');s.weightGoals=[];s.schemaVersion=6;}
  return validate(s);
 }
 export function latest(records,d){return records.filter(x=>x.effective<=d).sort((a,b)=>a.effective.localeCompare(b.effective)||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)).at(-1)??null;}
+export function calculateWeightGoal(referenceWeight,referenceSunday,targetWeight,targetSunday){
+ referenceWeight=number(referenceWeight,'Starting weight',{positive:true});targetWeight=number(targetWeight,'Goal weight',{positive:true});
+ date(referenceSunday);date(targetSunday);
+ assert(weekStart(referenceSunday)===referenceSunday&&weekStart(targetSunday)===targetSunday,'Choose Sunday check-in dates.');
+ assert(targetSunday>referenceSunday,'Target Sunday must be after the starting Sunday.');
+ assert(targetWeight<=referenceWeight,'For a weight-loss goal, goal weight must be at or below the starting weight.');
+ // Calendar Sundays, rather than elapsed local hours, keep the interval stable across DST.
+ const weeks=(Date.parse(targetSunday+'T12:00:00Z')-Date.parse(referenceSunday+'T12:00:00Z'))/604800000;
+ const totalLoss=referenceWeight-targetWeight,lossPerWeek=totalLoss/weeks;
+ return {referenceWeight,referenceSunday,targetWeight,targetSunday,weeks,totalLoss,lossPerWeek,percentPerWeek:lossPerWeek/referenceWeight*100,formula:'sunday-deadline-v1'};
+}
+export function saveWeightGoal(s,input){
+ const effective=date(input.effective),values=calculateWeightGoal(input.referenceWeight,input.referenceSunday,input.targetWeight,input.targetSunday);
+ assert(values.referenceSunday<=effective,'Starting Sunday cannot be after the effective date.');
+ assert(values.targetSunday>effective,'Choose an upcoming Sunday for your goal.');
+ const record={...stamp(),effective,...values,referenceSource:input.referenceSource??'manual',referenceWindow:clone(input.referenceWindow??null)};
+ s.weightGoals.push(record);return record;
+}
+export function lossGoalAt(s,d){const goal=latest(s.weightGoals??[],d);return goal?{value:goal.lossPerWeek,unit:'lb'}:clone(latest(s.plans,d)?.goal??null);}
 export function medianWindow(weights,d){const from=addDays(d,-6),rows=weights.filter(w=>w.date>=from&&w.date<=d),values=rows.map(w=>w.lb).sort((a,b)=>a-b),n=values.length;return {from,to:d,count:n,value:n?(n%2?values[(n-1)/2]:(values[n/2-1]+values[n/2])/2):null,weights:clone(rows)};}
 export function change(previous,current){if(previous==null||current==null)return null;const loss=previous-current;return {loss,percent:loss/previous*100};}
 export function weightChangeText(previous,current){
@@ -206,14 +226,16 @@ export function buildCheckin(s,d){
  const current=medianWindow(s.weights,d),prior=previous?.weight??medianWindow(s.weights,addDays(d,-7)),review=diaryReview(s,addDays(d,-7),addDays(d,-1));
  const cardio=cardioTotal(s,addDays(d,-1)),training=trainingWeek(s,addDays(d,-1)),stepTotals=s.stepTotals.filter(x=>x.date>=review.from&&x.date<=review.to),stepTargets=dates(review.from,review.to).map(date=>({date,target:clone(latest(s.stepTargets,date))}));
  const nextTarget=latest(s.cardioTargets,d),nextBudget=cardioTotal(s,d,{asOfDate:d});
- return {...stamp(),date:d,calculationVersion:'chris-v2-day-status',weight:current,previousWeight:clone(prior),change:change(prior.value,current.value),phase:clone(latest(s.phases,d)),review,reviewedPlans:dates(review.from,review.to).map(date=>({date,plan:clone(latest(s.plans,date))})),cardio:{...clone(cardio),targetVersions:clone(s.cardioTargets.filter(x=>x.effective<=review.to)),credits:clone(s.cardioCredits.filter(x=>x.date>=review.from&&x.date<=review.to))},training:clone(training),trainingSchedules:clone(s.trainingSchedules.filter(x=>x.effective<=review.to)),stepTargets,stepTotals:clone(stepTotals),nextPlan:clone(latest(s.plans.filter(p=>p.effective>=d),d)),nextCardio:clone(nextTarget),nextCardioRollover:{carriedIn:nextBudget.carriedIn,remainingAfterCredit:nextTarget?Math.max(0,-minuteDifference(nextBudget.carriedIn,nextTarget.weekly)):null,rolloverFrom:nextBudget.rolloverFrom},nextSteps:clone(latest(s.stepTargets,d))};
+ return {...stamp(),date:d,calculationVersion:'chris-v3-weight-goal',weight:current,previousWeight:clone(prior),change:change(prior.value,current.value),phase:clone(latest(s.phases,d)),review,reviewedPlans:dates(review.from,review.to).map(date=>({date,plan:clone(latest(s.plans,date))})),reviewedWeightGoals:dates(review.from,review.to).map(date=>({date,goal:clone(latest(s.weightGoals??[],date))})),nextWeightGoal:clone(latest(s.weightGoals??[],d)),cardio:{...clone(cardio),targetVersions:clone(s.cardioTargets.filter(x=>x.effective<=review.to)),credits:clone(s.cardioCredits.filter(x=>x.date>=review.from&&x.date<=review.to))},training:clone(training),trainingSchedules:clone(s.trainingSchedules.filter(x=>x.effective<=review.to)),stepTargets,stepTotals:clone(stepTotals),nextPlan:clone(latest(s.plans.filter(p=>p.effective>=d),d)),nextCardio:clone(nextTarget),nextCardioRollover:{carriedIn:nextBudget.carriedIn,remainingAfterCredit:nextTarget?Math.max(0,-minuteDifference(nextBudget.carriedIn,nextTarget.weekly)):null,rolloverFrom:nextBudget.rolloverFrom},nextSteps:clone(latest(s.stepTargets,d))};
 }
 export function checkinText(c){
  const fmt=v=>v==null?'Unavailable':String(Math.round(v*100)/100),macro=p=>p?`${fmt(p.calories)} kcal; ${fmt(p.protein)} P (${p.band.join('–')} g band), ${fmt(p.carbs)} C, ${fmt(p.fat)} F`:'Unset';
  const med=w=>`${w.from}–${w.to}: ${fmt(w.value)} lb (${w.count}/7${w.count<7?', incomplete':''})`;
  const goal=p=>p?`${fmt(p.goal.value)} ${p.goal.unit}/week`:'Unset';
+ const deadline=g=>`${fmt(g.targetWeight)} lb by Sunday ${g.targetSunday}; ${fmt(g.lossPerWeek)} lb/week; starting ${fmt(g.referenceWeight)} lb on ${g.referenceSunday}; ${g.weeks} weeks; effective ${g.effective}`;
  const lines=[`CHECK-IN ${c.date} · ${c.phase?.phase??'Phase unset'}`,`This week median: ${med(c.weight)}`,`Previous week median: ${med(c.previousWeight)}`,`Change (this week minus previous): ${weightChangeText(c.previousWeight.value,c.weight.value)}${c.change?`; ${fmt(Math.abs(c.change.percent))}% ${c.change.loss>0?'loss':c.change.loss<0?'gain':'no change'}`:''}`,`Reviewed diary week: ${c.review.from}–${c.review.to}`,c.calculationVersion==='chris-v1'?`Coverage: ${c.review.counts.Complete} Complete / ${c.review.counts.Unfinished} Unfinished / ${c.review.counts.Untracked} Untracked (of 7)`:`Coverage: ${c.review.counts.Complete} Completed / ${c.review.counts.Untracked} Untracked (of 7); ${c.review.emptyCompletedDays} empty Completed days excluded from averages`,`Average on ${c.review.denominator} ${c.calculationVersion==='chris-v1'?'Complete days':'Completed days with recorded intake'} [${c.review.completeDates.join(', ')}]: ${c.review.average?`${fmt(c.review.average.calories)} kcal; ${fmt(c.review.average.protein)} P, ${fmt(c.review.average.carbs)} C, ${fmt(c.review.average.fat)} F`:'Unavailable'}`,'Incomplete coverage cannot establish full-week intake.','REVIEWED TARGETS & GOALS'];
- for(const x of c.reviewedPlans)lines.push(`${x.date}: ${macro(x.plan)} · intended loss ${goal(x.plan)} · effective ${x.plan?.effective??'unset'}`);
+ for(const x of c.reviewedPlans){const g=c.reviewedWeightGoals?.find(y=>y.date===x.date)?.goal;lines.push(`${x.date}: ${macro(x.plan)} · intended loss ${g?`${fmt(g.lossPerWeek)} lb/week`:goal(x.plan)} · effective ${x.plan?.effective??'unset'}`);}
+ if(c.reviewedWeightGoals)for(const g of c.reviewedWeightGoals.map(x=>x.goal).filter((g,i,a)=>g&&a.findIndex(x=>x?.id===g.id)===i))lines.push(`Reviewed weight goal: ${deadline(g)}`);
  lines.push('DAILY BREAKDOWN');for(const d of c.review.days)lines.push(`${d.date} · ${fmt(d.weight)} lb · ${d.status==='Complete'&&c.calculationVersion!=='chris-v1'?'Completed':d.status} · ${d.intakeRecorded===false?'no intake logged':d.status==='Untracked'?'intake unknown':`${d.status==='Unfinished'?'partial ':''}${fmt(d.totals.calories)} kcal; ${fmt(d.totals.protein)} P, ${fmt(d.totals.carbs)} C, ${fmt(d.totals.fat)} F`}`);
  lines.push(`Training: ${c.training.filter(t=>t.completed).length}/${c.training.length} marked complete`);for(const t of c.training){lines.push(`${t.date} ${t.title}: ${t.completed?'Complete':'Not marked complete'}`);if(t.exercises?.length)lines.push('Exercises: '+t.exercises.map(e=>e.name).join(', '));}
  if(c.cardio.rolloverVersion){lines.push(`Cardio performed: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}`,`Cardio credit: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min credited; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Carried credit is not another performed session.`);}
@@ -221,7 +243,8 @@ export function checkinText(c){
  for(const v of c.cardio.targetVersions)lines.push(`Cardio target effective ${v.effective}: ${fmt(v.weekly)} min/week; ${v.category}`);
  for(const t of c.stepTargets)lines.push(`Step target ${t.date}: ${fmt(t.target?.target)} (effective ${t.target?.effective??'unset'})`);
  if(c.stepTotals.length){lines.push('Manual step totals:');for(const t of c.stepTotals)lines.push(`${t.date}: ${t.total}`);lines.push(`Average steps on ${c.stepTotals.length} available completed dates [${c.stepTotals.map(t=>t.date).join(', ')}]: ${fmt(c.stepTotals.reduce((a,t)=>a+t.total,0)/c.stepTotals.length)}`);}
- lines.push('NEXT SAVED PLAN',c.nextPlan?`${macro(c.nextPlan)} · goal ${goal(c.nextPlan)} · effective ${c.nextPlan.effective}`:'Next plan not yet set',`Next cardio: ${c.nextCardio?`${fmt(c.nextCardio.weekly)} min/week (${fmt(c.nextCardio.daily)} min/day × ${c.nextCardio.days}), ${c.nextCardio.category}, effective ${c.nextCardio.effective}`:'Unset'}`);
+ lines.push('NEXT SAVED PLAN',c.nextPlan?`${macro(c.nextPlan)} · goal ${c.nextWeightGoal?`${fmt(c.nextWeightGoal.lossPerWeek)} lb/week`:goal(c.nextPlan)} · effective ${c.nextPlan.effective}`:'Next plan not yet set',`Next cardio: ${c.nextCardio?`${fmt(c.nextCardio.weekly)} min/week (${fmt(c.nextCardio.daily)} min/day × ${c.nextCardio.days}), ${c.nextCardio.category}, effective ${c.nextCardio.effective}`:'Unset'}`);
+ if(c.calculationVersion==='chris-v3-weight-goal')lines.push(c.nextWeightGoal?`Next weight goal: ${deadline(c.nextWeightGoal)}`:'Next weight goal not yet set');
  if(c.nextCardioRollover)lines.push(`Next cardio credit: ${fmt(c.nextCardioRollover.carriedIn)} min carried in; ${fmt(c.nextCardioRollover.remainingAfterCredit)} min target left before new sessions. Rollover starts ${c.nextCardioRollover.rolloverFrom}.`);
  lines.push(`Next daily step target: ${fmt(c.nextSteps?.target)} · effective ${c.nextSteps?.effective??'unset'}`);return lines.join('\n');
 }
@@ -230,7 +253,7 @@ export function checkinText(c){
 export function validate(s){
  assert(s&&typeof s==='object'&&!Array.isArray(s),'Invalid backup.');assert(s.schemaVersion===VERSION,'Unsupported backup version. Your current records have not changed.');
  const requiredDates=new Set(['entries','plannedEntries','weights','statuses','checkins','cardioSessions','cardioCredits','trainingOccurrences','stepTotals']);
- const requiredEffective=new Set(['plans','phases','cardioTargets','trainingSchedules','stepTargets']);
+ const requiredEffective=new Set(['plans','phases','cardioTargets','trainingSchedules','stepTargets','weightGoals']);
  const allowed=new Set(['schemaVersion','revision','settings',...TABLES]);assert(Object.keys(s).every(k=>allowed.has(k)),'Backup has unsupported fields; nothing was imported.');
  assert(Number.isInteger(s.revision)&&s.revision>=0,'Invalid revision.');assert(s.settings&&typeof s.settings==='object','Missing settings.');assert(typeof s.settings.timezone==='string'&&s.settings.timezone,'Missing timezone.');assert(s.settings.lastExport===null||typeof s.settings.lastExport==='string'&&Number.isFinite(Date.parse(s.settings.lastExport)),'Invalid backup date.');
  try{new Intl.DateTimeFormat('en',{timeZone:s.settings.timezone}).format();}catch{throw new Error('Invalid timezone.');}
@@ -248,6 +271,21 @@ export function validate(s){
  unique(s.weights,x=>x.date,'weight date');for(const w of s.weights)checkNum(w.lb,'weight',true);
  unique(s.statuses,x=>x.date,'diary status date');for(const r of s.statuses)assert(['Complete','Untracked'].includes(r.status),'Invalid diary status.');for(const r of s.statuses)if(r.zeroIntakeConfirmed!==undefined)assert(typeof r.zeroIntakeConfirmed==='boolean','Invalid zero intake confirmation.');
  for(const p of s.plans){const expected=calculateTargets(p.calories,p.reference,p.overrides);for(const k of ['protein','fat','carbs','macroCalories'])assert(expected[k]===p[k],'Invalid saved macro calculation.');assert(JSON.stringify(expected.band)===JSON.stringify(p.band),'Invalid protein band.');checkNum(p.goal.value,'goal');assert(['lb','%'].includes(p.goal.unit),'Invalid authoritative goal unit.');assert(p.formula==='chris-v1-half-up','Unsupported target formula.');}
+ for(const g of s.weightGoals){
+  checkNum(g.referenceWeight,'starting weight',true);checkNum(g.targetWeight,'goal weight',true);
+  const expected=calculateWeightGoal(g.referenceWeight,g.referenceSunday,g.targetWeight,g.targetSunday);
+  for(const k of ['weeks','totalLoss','lossPerWeek','percentPerWeek','formula'])assert(g[k]===expected[k],'Invalid saved weight-goal calculation.');
+  assert(g.referenceSunday<=g.effective&&g.targetSunday>g.effective,'Invalid weight-goal effective date.');
+  assert(['manual','median','checkin','saved-plan'].includes(g.referenceSource),'Invalid weight-goal reference source.');
+  assert(g.referenceWindow===null||g.referenceWindow&&typeof g.referenceWindow==='object','Missing weight-goal reference snapshot.');
+  if(['median','checkin'].includes(g.referenceSource))assert(g.referenceWindow,'Missing weight-goal median snapshot.');
+  if(g.referenceWindow){
+   const w=g.referenceWindow;assert(Array.isArray(w.weights)&&w.weights.length>0&&w.weights.length<=7,'Invalid goal reference window.');
+   unique(w.weights,x=>x.date,'goal reference weight date');
+   for(const x of w.weights){date(x.date);checkNum(x.lb,'goal reference weight',true);assert(x.date>=w.from&&x.date<=w.to,'Weight outside goal reference window.');}
+   assert(w.from===addDays(g.referenceSunday,-6)&&w.to===g.referenceSunday&&w.count===w.weights.length&&w.value===g.referenceWeight&&medianWindow(w.weights,w.to).value===w.value,'Invalid goal reference median.');
+  }
+ }
  for(const p of s.phases)assert(['Cut','Maintenance','Gain'].includes(p.phase),'Invalid phase.');
  for(const c of s.cardioTargets){checkNum(c.weekly,'weekly minutes');checkNum(c.days,'cardio days',true);assert(Number.isInteger(c.days)&&c.days<=7,'Cardio days must be 1–7.');checkNum(c.daily,'daily minutes');assert(Math.abs(c.daily*c.days-c.weekly)<1e-8,'Linked cardio values disagree.');assert(['daily','weekly'].includes(c.authority),'Missing cardio authority.');}
  for(const x of s.cardioSessions){checkNum(x.minutes,'cardio minutes',true);assert(typeof x.completed==='boolean','Invalid performed flag.');}
@@ -261,7 +299,7 @@ export function validate(s){
  for(const t of s.stepTargets)checkNum(t.target,'step target');unique(s.stepTotals,x=>x.date,'step total date');for(const t of s.stepTotals)assert(Number.isInteger(t.total)&&t.total>=0,'Invalid step total.');
  unique(s.favourites,x=>x.foodId,'favourite');for(const f of s.favourites)assert(s.foods.some(x=>x.id===f.foodId),'Favourite food is missing.');
  for(const c of s.checkins){
-  assert(['chris-v1','chris-v2-day-status'].includes(c.calculationVersion)&&weekStart(c.date)===c.date,'Invalid Sunday snapshot version/date.');
+  assert(['chris-v1','chris-v2-day-status','chris-v3-weight-goal'].includes(c.calculationVersion)&&weekStart(c.date)===c.date,'Invalid Sunday snapshot version/date.');
   const window=w=>{assert(w&&Array.isArray(w.weights),'Missing saved weight window.');date(w.from);date(w.to);assert(w.from===addDays(w.to,-6),'Invalid saved window dates.');assert(w.count===w.weights.length&&Number.isInteger(w.count)&&w.count>=0&&w.count<=7,'Invalid saved weigh-in count.');unique(w.weights,x=>x.date,'saved weight date');for(const x of w.weights){date(x.date);checkNum(x.lb,'saved weight',true);assert(x.date>=w.from&&x.date<=w.to,'Weight outside saved window.');}assert(medianWindow(w.weights,w.to).value===w.value,'Invalid saved median.');};
   window(c.weight);window(c.previousWeight);assert(c.weight.to===c.date&&c.previousWeight.to===addDays(c.date,-7),'Invalid comparison dates.');
   assert(c.review&&Array.isArray(c.review.days)&&c.review.days.length===7&&Array.isArray(c.review.completeDates),'Missing saved diary review.');assert(c.review.from===addDays(c.date,-7)&&c.review.to===addDays(c.date,-1),'Invalid diary review dates.');
@@ -298,7 +336,16 @@ export function validate(s){
    assert(next.remainingAfterCredit===(c.nextCardio?Math.max(0,-minuteDifference(next.carriedIn,c.nextCardio.weekly)):null),'Invalid next-week remaining minutes.');
    if(c.cardio.rolloverVersion&&c.cardio.asOfDate>=c.date)assert(next.carriedIn===c.cardio.carryOut,'Next-week credit does not match the closed review week.');
   }
-  const nested=emptyStore();nested.plans=[...c.reviewedPlans.map(x=>x.plan).filter(Boolean),...(c.nextPlan?[c.nextPlan]:[])].filter((p,i,a)=>a.findIndex(x=>x.id===p.id)===i);nested.cardioSessions=[...(c.cardio.rolloverHistory??[]).flatMap(w=>w.sessions),...c.cardio.sessions];nested.cardioCredits=c.cardio.credits??[];nested.cardioTargets=c.cardio.targetVersions;nested.stepTotals=c.stepTotals;nested.trainingSchedules=c.trainingSchedules??[];nested.trainingOccurrences=c.training.map(t=>({...t,createdAt:t.createdAt??c.createdAt}));
+  const nested=emptyStore();
+  if(c.calculationVersion==='chris-v3-weight-goal'){
+   assert(Array.isArray(c.reviewedWeightGoals)&&c.reviewedWeightGoals.length===7,'Missing saved weight goals.');
+   for(const [i,x] of c.reviewedWeightGoals.entries())assert(x.date===addDays(c.review.from,i)&&(x.goal===null||x.goal?.effective<=x.date),'Invalid reviewed weight-goal dates.');
+   assert(c.nextWeightGoal===null||c.nextWeightGoal?.effective<=c.date,'Invalid next weight goal.');
+   const goals=[...c.reviewedWeightGoals.map(x=>x.goal),c.nextWeightGoal].filter(Boolean);
+   for(const g of goals)assert(JSON.stringify(g)===JSON.stringify(goals.find(x=>x.id===g.id)),'Conflicting saved weight-goal calculation.');
+   nested.weightGoals=goals.filter((g,i,a)=>a.findIndex(x=>x.id===g.id)===i);
+  }
+  nested.plans=[...c.reviewedPlans.map(x=>x.plan).filter(Boolean),...(c.nextPlan?[c.nextPlan]:[])].filter((p,i,a)=>a.findIndex(x=>x.id===p.id)===i);nested.cardioSessions=[...(c.cardio.rolloverHistory??[]).flatMap(w=>w.sessions),...c.cardio.sessions];nested.cardioCredits=c.cardio.credits??[];nested.cardioTargets=c.cardio.targetVersions;nested.stepTotals=c.stepTotals;nested.trainingSchedules=c.trainingSchedules??[];nested.trainingOccurrences=c.training.map(t=>({...t,createdAt:t.createdAt??c.createdAt}));
   validate(nested);
   assert(c.cardio.minutes===c.cardio.sessions.filter(x=>x.completed).reduce((a,x)=>a+x.minutes,0),'Invalid saved cardio minutes.');
  }
