@@ -160,7 +160,7 @@ export function cardioTotal(s,d,{asOfDate=today(s.settings.timezone)}={}){
  const from=weekStart(d),rolloverFrom=cardioRolloverStart(s),currentWeek=weekStart(asOfDate),history=[];
  const entered=countedCardioSessions(s.cardioSessions);
  function budget(week,carriedIn){
-  const to=addDays(week,6),cutoff=to<asOfDate?to:asOfDate,sessions=entered.filter(x=>x.date>=week&&x.date<=to),target=latest(s.cardioTargets,cutoff),minutes=sessions.reduce((a,x)=>a+x.minutes,0),creditedMinutes=minutes+carriedIn,enabled=week>=rolloverFrom;
+  const to=addDays(week,6),cutoff=to<asOfDate?to:(week===from&&d>asOfDate?d:asOfDate),sessions=entered.filter(x=>x.date>=week&&x.date<=to),target=latest(s.cardioTargets,cutoff),minutes=sessions.reduce((a,x)=>a+x.minutes,0),creditedMinutes=minutes+carriedIn,enabled=week>=rolloverFrom;
   const balance=target?minuteDifference(creditedMinutes,target.weekly):null,remaining=target?Math.max(0,-balance):null;
   // Unset is not a zero target: retain an existing bank, but create no new surplus.
   const carryOut=enabled?(target?Math.max(0,balance):carriedIn):0;
