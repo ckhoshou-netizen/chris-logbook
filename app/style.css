@@ -70,6 +70,16 @@ main:focus{outline:0}
 .diary-status select{min-width:148px;margin:0;font-size:.9375rem}
 .status-note{font-size:.9375rem;color:var(--muted);margin:6px 0 8px}
 .timeline{padding:0;margin:0;list-style:none}
+.hourly-timeline,.hour-foods{list-style:none;padding:0;margin:0}
+.food-hour{border-top:1px solid var(--line);padding-block:4px}
+.hour-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:48px}
+.hour-heading h3{font-size:.9375rem;font-weight:500;color:var(--muted)}
+.hour-add{display:grid;place-items:center;flex-shrink:0;width:44px;min-height:44px;border:1px solid transparent;border-radius:7px;color:var(--accent);font-size:1.75rem;line-height:1}
+.hour-add:hover,.hour-add:focus-visible{border-color:var(--accent);background:var(--surface)}
+.hour-foods{padding:0 0 12px 16px;border-left:2px solid var(--line);margin:0 0 8px 2px}
+.hour-foods>.food{padding:12px 0 16px}
+.hour-foods>.food:first-child{padding-top:4px}
+.hour-foods>.food:last-child{border-bottom:0;padding-bottom:4px}
 .food{padding:17px 0;border-bottom:1px solid var(--line)}
 .food strong{font-size:1.0625rem;font-weight:550}
 .food time{font-size:.875rem;color:var(--muted);display:block;margin-bottom:5px}
