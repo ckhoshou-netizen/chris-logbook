@@ -65,12 +65,11 @@ function nutritionScreen(){
 }
 function cardioDayRow(cardio){
  return `<div class="week-row cardio-days" role="group" aria-label="Daily cardio minutes">${D.dates(cardio.from,cardio.to).map(date=>{
-  // Use the same performed sessions as the weekly total. Coverage and carried credit
-  // belong to the weekly budget and must not imply a session on another day.
-  const minutes=cardio.sessions.filter(session=>session.date===date).reduce((sum,session)=>sum+session.minutes,0);
+  // Show saved future amounts while completed weekly totals remain date-aware.
+  const {minutes,pending}=D.cardioDayValue(state,date,now());
   const amount=minutes>0&&minutes<.005?'<0.01':fmt(minutes,2);
   const weekday=new Date(date+'T12:00Z').toLocaleDateString('en',{weekday:'short',timeZone:'UTC'});
-  return `<button type="button" data-action="cardio-day" data-value="${date}" aria-label="${h(fullDate(date))}: ${h(amount)} minutes. ${date>now()?'Available on this date':'Edit cardio'}" class="day-slot cardio-day ${minutes>0?'has-cardio':''} ${date===selectedDate?'today':''}" ${date>now()?'disabled':''}><span>${weekday}</span><span class="day-mark number">${h(amount)}</span></button>`;
+  return `<button type="button" data-action="cardio-day" data-value="${date}" aria-label="${h(fullDate(date))}: ${h(amount)} minutes. ${pending?'Saved amount; edit cardio':'Edit cardio'}" class="day-slot cardio-day ${minutes>0&&!pending?'has-cardio':''} ${pending?'cardio-pending':''} ${date===selectedDate?'today':''}"><span>${weekday}</span><span class="day-mark number">${h(amount)}</span>${pending&&date<=now()?'<span class="cardio-confirm">Update</span>':''}</button>`;
  }).join('')}</div><p class="caption">Tap a day to edit minutes</p>`;
 }
 function trainingScreen(){
@@ -192,9 +191,9 @@ let cardioExact=null;
 function linkCardio(inputName){const f=dialog.querySelector('form'),days=D.number(f.days.value,'Planned days',{positive:true});D.assert(Number.isInteger(days)&&days<=7,'Choose 1–7 cardio days.');let authority=f.authority.value;if(['daily','weekly'].includes(inputName))authority=f.authority.value=inputName;const raw=f.elements[authority].value;if(raw===''){f.daily.value='';f.weekly.value='';cardioExact=null;return;}const value=D.number(raw,'Cardio minutes');const weekly=authority==='weekly'?value:value*days;cardioExact={weekly,daily:weekly/days,days,authority};if(authority==='weekly')f.daily.value=String(Math.round(weekly/days*1e6)/1e6);else f.weekly.value=String(weekly);}
 function focusCardioDay(d){if(d)document.querySelector(`[data-action="cardio-day"][data-value="${d}"]`)?.focus({preventScroll:true});}
 function cardioDaySheet(d){
- D.date(d);D.assert(d<=now(),'Choose today or a past day to enter cardio.');editing={cardioDate:d};
- const minutes=state.cardioSessions.filter(x=>x.date===d&&x.completed).reduce((sum,x)=>sum+x.minutes,0);
- modal('Cardio',form('cardio-day',`<p class="caption">${new Date(d+'T12:00Z').toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}</p>${field('minutes','Minutes',minutes,{required:true,unit:'min'})}`,'Update'));
+ D.date(d);editing={cardioDate:d};
+ const {minutes,pending}=D.cardioDayValue(state,d,now());
+ modal('Cardio',form('cardio-day',`<p class="caption">${new Date(d+'T12:00Z').toLocaleDateString('en-CA',{weekday:'long',month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}</p>${field('minutes','Minutes',minutes,{required:true,unit:'min'})}${d>now()?'<p class="caption">Saved for this date; excluded from weekly totals until updated on or after that day.</p>':pending?'<p class="caption">Update to include these minutes in your weekly total.</p>':''}`,'Update'));
  const input=dialog.querySelector('[name="minutes"]');input.focus();input.select();
 }
 function stepsSheet(){const x=state.stepTotals.find(s=>s.date===selectedDate);modal('Optional Step Total',form('steps',`${field('date','Date',selectedDate,{type:'date',required:true,extra:`max="${now()}"`})}${field('total','Manual Total',x?.total??'',{required:true,step:1})}<p class="caption">Today’s total is partial. Missing totals remain unavailable.</p>`,'Save Total'));}
