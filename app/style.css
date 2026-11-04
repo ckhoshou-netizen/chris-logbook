@@ -87,9 +87,10 @@ main:focus{outline:0}
 .food .kcal{font-size:1.125rem;white-space:nowrap;text-align:right}
 .food .kcal small{display:block;font-size:.875rem}
 .week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:20px 0}
+.cardio-days{grid-template-columns:repeat(auto-fit,minmax(min(100%,2rem),1fr));row-gap:12px}
 .day-slot{text-align:center;font-size:.875rem;color:var(--muted)}
 .day-mark{display:grid;place-items:center;min-height:32px;margin-top:7px;border-bottom:2px solid var(--line);font-size:1.125rem}
-.covered .day-mark{border-color:var(--accent);color:var(--accent)}
+.has-cardio .day-mark{border-color:var(--accent);color:var(--accent)}
 .day-slot.today>span:first-child{text-decoration:underline;text-underline-offset:4px;color:var(--text)}
 .check-row{display:flex;align-items:center;gap:12px;min-height:52px;padding:7px 0;border-bottom:1px solid var(--line)}
 .check-row input{appearance:auto;accent-color:var(--accent);width:26px;height:26px;min-height:26px;flex-shrink:0;margin:0}
@@ -169,7 +170,7 @@ th{color:var(--muted);font-weight:500}
 #toast{position:fixed;z-index:30;left:50%;bottom:100px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:16px;max-width:90%;border-radius:5px}
 @media(min-width:700px){body{background:#10151b}.app-shell,.preview-toolbar{background:var(--bg)}.app-shell{border-inline:1px solid var(--line)}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
-@media(forced-colors:active){.primary,.secondary,.bottom-nav a[aria-current]{border:2px solid ButtonText}.progress span{background:Highlight}.covered .day-mark{border-color:Highlight}}
+@media(forced-colors:active){.primary,.secondary,.bottom-nav a[aria-current]{border:2px solid ButtonText}.progress span{background:Highlight}.has-cardio .day-mark{border-color:Highlight}}
 .wordmark{display:inline-flex;align-items:center;min-height:44px}
 .diary-status{display:grid;grid-template-columns:auto minmax(0,1fr)}
 .diary-status select{min-width:0;width:100%}
