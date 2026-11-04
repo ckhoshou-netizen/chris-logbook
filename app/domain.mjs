@@ -220,6 +220,40 @@ export function markTraining(s,occurrenceKey,completed,currentDate=today(s.setti
  s.trainingOccurrences=s.trainingOccurrences.filter(x=>x.key!==occurrence.key);s.trainingOccurrences.push({...occurrence,...stamp(),completed:!!completed});
 }
 export function reconcileCredits(s,sessionId){const session=s.cardioSessions.find(x=>x.id===sessionId),credits=s.cardioCredits.filter(x=>x.sessionId===sessionId);let available=session?.completed?session.minutes:0;for(const c of credits){c.minutes=Math.min(c.minutes,available);available-=c.minutes;}s.cardioCredits=s.cardioCredits.filter(x=>x.minutes>0);}
+function cardioDaySnapshot(s,d,sessionIds=[]){
+ const sessions=s.cardioSessions.filter(x=>x.date===d&&x.completed),ids=new Set([...sessionIds,...sessions.map(x=>x.id)]);
+ return clone({sessions,credits:s.cardioCredits.filter(x=>ids.has(x.sessionId))});
+}
+export function setCardioDayTotal(s,d,value,currentDate=today(s.settings.timezone)){
+ date(d);date(currentDate);assert(d<=currentDate,'Choose today or a past day to enter cardio.');
+ const minutes=number(value,'Minutes'),before=cardioDaySnapshot(s,d),rows=s.cardioSessions.filter(x=>x.date===d&&x.completed).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
+ const previous=rows.reduce((sum,x)=>sum+x.minutes,0);let difference=minuteDifference(minutes,previous);
+ if(difference===0)return {date:d,before,after:clone(before),changed:false};
+ if(difference>0){
+  const last=rows.at(-1);
+  if(last)last.minutes+=difference;
+  else s.cardioSessions.push({...stamp(),date:d,minutes,completed:true,category:latest(s.cardioTargets,d)?.category??''});
+ }else{
+  // Reduce the newest entries first; preserve earlier records and IDs when possible.
+  let reduction=-difference;
+  for(const row of rows.reverse()){
+   if(reduction<=0)break;
+   const remaining=minuteDifference(row.minutes,reduction);
+   if(remaining>0){row.minutes=remaining;reduction=0;}
+   else {reduction=Math.max(0,-remaining);s.cardioSessions=s.cardioSessions.filter(x=>x.id!==row.id);}
+   reconcileCredits(s,row.id);
+  }
+ }
+ return {date:d,before,after:cardioDaySnapshot(s,d,before.sessions.map(x=>x.id)),changed:true};
+}
+export function undoCardioDayTotal(s,change){
+ const ids=[...change.before.sessions,...change.after.sessions].map(x=>x.id),current=cardioDaySnapshot(s,change.date,ids);
+ assert(JSON.stringify(current)===JSON.stringify(change.after),'This day changed after the update. Your newer cardio was kept.');
+ const tracked=new Set(ids);
+ assert(!s.cardioSessions.some(x=>tracked.has(x.id)&&(!x.completed||x.date!==change.date)),'A newer cardio record conflicts with Undo.');
+ s.cardioSessions=s.cardioSessions.filter(x=>!tracked.has(x.id));s.cardioSessions.push(...clone(change.before.sessions));
+ s.cardioCredits=s.cardioCredits.filter(x=>!tracked.has(x.sessionId));s.cardioCredits.push(...clone(change.before.credits));
+}
 export function buildCheckin(s,d){
  assert(weekStart(d)===d,'Choose a Sunday check-in date.');
  const previous=s.checkins.filter(x=>x.date===addDays(d,-7)).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)).at(-1);

@@ -87,7 +87,7 @@ main:focus{outline:0}
 .food .kcal{font-size:1.125rem;white-space:nowrap;text-align:right}
 .food .kcal small{display:block;font-size:.875rem}
 .week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:20px 0}
-.cardio-days{grid-template-columns:repeat(auto-fit,minmax(min(100%,2rem),1fr));row-gap:12px}
+.cardio-days{grid-template-columns:repeat(auto-fit,minmax(min(100%,2.75rem),1fr));gap:12px 3px}
 .day-slot{text-align:center;font-size:.875rem;color:var(--muted)}
 .day-mark{display:grid;place-items:center;min-height:32px;margin-top:7px;border-bottom:2px solid var(--line);font-size:1.125rem}
 .has-cardio .day-mark{border-color:var(--accent);color:var(--accent)}
@@ -397,3 +397,8 @@ button,a,input,select,textarea,summary{scroll-margin-block:20px calc(var(--nav-h
 .weekly-plan>.primary,.weekly-plan>.secondary{margin-block:12px}
 .weekly-save{display:grid;gap:12px;margin-top:24px}
 .weekly-save>.caption{margin:0}
+
+.cardio-day{padding:10px 0 0;min-height:72px;min-width:0;border-radius:5px;text-align:center}
+.cardio-day>span:first-child{display:block}
+.cardio-day:hover:enabled{background:var(--surface)}
+.cardio-day:disabled{cursor:default;opacity:.65}

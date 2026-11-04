@@ -14,7 +14,7 @@ test('task-based screens retain the same foods, workout references, weights and 
  const s=fixture(),before=structuredClone(s),{api}=ui(s,'2026-11-03');
  const nutrition=api.nutritionScreen(),training=api.trainingScreen(),checkin=api.checkinScreen();
  assert.match(nutrition,/Synthetic Cereal/);assert.match(nutrition,/240/);assert.doesNotMatch(nutrition,/data-action="weight"|data-training=|Log Cardio/);
- assert.match(training,/Torso A/);assert.match(training,/Bench Press/);assert.match(training,/Log Cardio/);assert.doesNotMatch(training,/Calories Recorded|data-action="weight"/);
+ assert.match(training,/Torso A/);assert.match(training,/Bench Press/);assert.match(training,/data-action="cardio-day"/);assert.doesNotMatch(training,/Calories Recorded|data-action="weight"/);
  assert.match(checkin,/Today’s Weight/);assert.match(checkin,/132 lb/);assert.match(checkin,/1,800/);assert.match(checkin,/0.5 lb\/week/);assert.match(checkin,/Weight Trends/);assert.match(checkin,/−2\.0 lb/);
  assert.deepEqual(s,before);assert.deepEqual(D.parseBackup(JSON.stringify(s)),before);
 });
