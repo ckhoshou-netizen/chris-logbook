@@ -95,7 +95,7 @@ function checkinScreen(){
  `<section class="weight-trends" aria-labelledby="weight-trends-title"><div class="section-title"><h2 id="weight-trends-title">Weight Trends</h2></div>${weightTrends()}</section>${backupReminder()}`;
 }
 function resolveTab(hash){return ({nutrition:'nutrition',training:'training',checkin:'checkin',today:'nutrition',trends:'checkin',sunday:'checkin'})[hash.replace(/^#/,'')]??'nutrition';}
-function render(){if(!state)return;const review=$('.checkin-review');if(review)weeklyReviewOpen=review.open;tab=resolveTab(location.hash);$('#screen').innerHTML=({nutrition:nutritionScreen,training:trainingScreen,checkin:checkinScreen}[tab])();for(const a of document.querySelectorAll('[data-tab]')){if(a.dataset.tab===tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}document.title=`${{nutrition:'Nutrition',training:'Training',checkin:'Check-in'}[tab]} · Road to the Stage`;}
+function render(){if(!state)return;const activeHour=document.activeElement?.dataset?.action==='food-hour'?document.activeElement.dataset.value:null;const review=$('.checkin-review');if(review)weeklyReviewOpen=review.open;tab=resolveTab(location.hash);$('#screen').innerHTML=({nutrition:nutritionScreen,training:trainingScreen,checkin:checkinScreen}[tab])();for(const a of document.querySelectorAll('[data-tab]')){if(a.dataset.tab===tab)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');}document.title=`${{nutrition:'Nutrition',training:'Training',checkin:'Check-in'}[tab]} · Road to the Stage`;focusFoodHour(activeHour);}
 
 function findFood(id){return catalog.find(f=>f.id===id)??state.foods.find(f=>f.id===id);}
 async function refreshCatalog(){
