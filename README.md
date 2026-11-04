@@ -1,4 +1,4 @@
-# Chris’ Logbook
+# Road to the Stage
 
 An independent iPhone Home Screen web app. It requires no ChatGPT subscription, ChatGPT login, paid AI API or server database.
 
@@ -25,3 +25,5 @@ Nutrition contains the food diary and food planning. Training contains the worko
 ## Development checks
 
 Run `npm ci` then `npm test` with Node.js 22 or later. Tests use synthetic records and check calculations, immutable history, storage migrations, backup/restore, food planning, exercise assignments, cardio rollover and saved weight comparisons. GitHub Pages serves app/ directly; no build tool or runtime service is required.
+
+The app title uses Barlow Condensed Bold Italic, bundled locally under the SIL Open Font License (see app/fonts/OFL-BarlowCondensed.txt). Body text and controls use the system font.

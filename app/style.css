@@ -266,3 +266,7 @@ textarea{width:100%}.split-row{border-bottom:1px solid var(--line);padding-botto
 .goals-card .stat-list .row{flex-wrap:wrap;gap:8px 16px}
 .goals-card .stat-list dt{flex:1 1 12rem}
 .goals-card .stat-list dd{flex:0 0 auto;text-align:left}
+
+/* The title uses a locally bundled, licensed display face; controls keep the system font. */
+@font-face{font-family:'Barlow Condensed';src:url('./fonts/BarlowCondensed-BoldItalic.ttf') format('truetype');font-style:italic;font-weight:700;font-display:swap}
+.wordmark{font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:700;font-style:italic;font-size:1.625rem;line-height:1.1;letter-spacing:.035em;text-transform:uppercase;color:var(--accent);min-width:0;overflow-wrap:anywhere}

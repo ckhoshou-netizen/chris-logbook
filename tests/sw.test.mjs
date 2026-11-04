@@ -9,5 +9,5 @@ test('a new worker revalidates every install asset so fresh HTTP caches cannot i
  const handlers={},requests=[];let completion;
  vm.runInNewContext(source,{URL,Request,Set,self:{location:{href:'https://example.test/chris-logbook/sw.js'},addEventListener:(name,handler)=>handlers[name]=handler},caches:{open:async()=>({addAll:async files=>requests.push(...files)})}});
  handlers.install({waitUntil:promise=>completion=promise});await completion;
- assert.equal(requests.length,11);for(const request of requests){assert.equal(request.cache,'reload');assert.ok(request.url.startsWith('https://example.test/chris-logbook/'));}
+ assert.equal(requests.length,12);for(const request of requests){assert.equal(request.cache,'reload');assert.ok(request.url.startsWith('https://example.test/chris-logbook/'));}
 });
