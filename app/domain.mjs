@@ -149,12 +149,18 @@ export function diaryReview(s,from,to){
 }
 function minuteDifference(a,b){const diff=a-b;return Math.abs(diff)<=Number.EPSILON*Math.max(1,Math.abs(a),Math.abs(b))*4?0:diff;}
 export function cardioRolloverStart(s){return s.settings.cardioRolloverFrom??CARDIO_ROLLOVER_START;}
+function countedCardioSessions(rows){
+ const days=new Map();for(const row of rows){if(!days.has(row.date))days.set(row.date,[]);days.get(row.date).push(row);}
+ // Older backups can hold a planned copy alongside logged entries for a day.
+ // Prefer the logged records in that case so the same day is not counted twice.
+ return [...days.values()].flatMap(day=>day.some(x=>x.completed)?day.filter(x=>x.completed):day);
+}
 export function cardioTotal(s,d,{asOfDate=today(s.settings.timezone)}={}){
  date(d);date(asOfDate);
  const from=weekStart(d),rolloverFrom=cardioRolloverStart(s),currentWeek=weekStart(asOfDate),history=[];
- const performed=s.cardioSessions.filter(x=>x.completed&&x.date<=asOfDate);
+ const entered=countedCardioSessions(s.cardioSessions);
  function budget(week,carriedIn){
-  const to=addDays(week,6),cutoff=to<asOfDate?to:asOfDate,sessions=performed.filter(x=>x.date>=week&&x.date<=to),target=latest(s.cardioTargets,cutoff),minutes=sessions.reduce((a,x)=>a+x.minutes,0),creditedMinutes=minutes+carriedIn,enabled=week>=rolloverFrom;
+  const to=addDays(week,6),cutoff=to<asOfDate?to:asOfDate,sessions=entered.filter(x=>x.date>=week&&x.date<=to),target=latest(s.cardioTargets,cutoff),minutes=sessions.reduce((a,x)=>a+x.minutes,0),creditedMinutes=minutes+carriedIn,enabled=week>=rolloverFrom;
   const balance=target?minuteDifference(creditedMinutes,target.weekly):null,remaining=target?Math.max(0,-balance):null;
   // Unset is not a zero target: retain an existing bank, but create no new surplus.
   const carryOut=enabled?(target?Math.max(0,balance):carriedIn):0;
@@ -169,7 +175,7 @@ export function cardioTotal(s,d,{asOfDate=today(s.settings.timezone)}={}){
  }
  // A future, still unopened week has no transferred credit from the open week.
  const result=budget(from,from<=currentWeek?carry:0);
- return {...result,rolloverVersion:'surplus-v1',rolloverFrom,asOfDate,rolloverHistory:history};
+ return {...result,rolloverVersion:'saved-minutes-v2',rolloverFrom,asOfDate,rolloverHistory:history};
 }
 export function makeExercise(input,previous=null){
  const name=String(input.name??'').trim();assert(name,'Exercise name is required.');
@@ -226,17 +232,17 @@ function cardioDaySnapshot(s,d,sessionIds=[]){
 }
 export function cardioDayValue(s,d,currentDate=today(s.settings.timezone)){
  date(d);date(currentDate);
- const all=s.cardioSessions.filter(x=>x.date===d),actual=d<=currentDate?all.filter(x=>x.completed):[],rows=actual.length?actual:all;
- return {minutes:rows.reduce((sum,x)=>sum+x.minutes,0),pending:rows.length>0&&actual.length===0};
+ const rows=countedCardioSessions(s.cardioSessions.filter(x=>x.date===d));
+ return {minutes:rows.reduce((sum,x)=>sum+x.minutes,0)};
 }
 export function setCardioDayTotal(s,d,value,currentDate=today(s.settings.timezone)){
  date(d);date(currentDate);
- const minutes=number(value,'Minutes'),before=cardioDaySnapshot(s,d),all=s.cardioSessions.filter(x=>x.date===d),actual=all.filter(x=>x.completed),completed=d<=currentDate;
- const rows=(completed&&actual.length?actual:all).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
+ const minutes=number(value,'Minutes'),before=cardioDaySnapshot(s,d),all=s.cardioSessions.filter(x=>x.date===d),actual=all.filter(x=>x.completed),completed=true;
+ const rows=(actual.length?actual:all).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id));
  if(minutes===0){
   const ids=new Set(all.map(x=>x.id));s.cardioSessions=s.cardioSessions.filter(x=>!ids.has(x.id));s.cardioCredits=s.cardioCredits.filter(x=>!ids.has(x.sessionId));
  }else{
-  // Updating an elapsed date confirms its saved amount. Dates ahead remain upcoming.
+  // Every saved daily amount is active immediately, including future dates.
   for(const row of rows){row.completed=completed;reconcileCredits(s,row.id);}
   const previous=rows.reduce((sum,x)=>sum+x.minutes,0),difference=minuteDifference(minutes,previous);
   if(difference>0){
@@ -284,7 +290,8 @@ export function checkinText(c){
  if(c.reviewedWeightGoals)for(const g of c.reviewedWeightGoals.map(x=>x.goal).filter((g,i,a)=>g&&a.findIndex(x=>x?.id===g.id)===i))lines.push(`Reviewed weight goal: ${deadline(g)}`);
  lines.push('DAILY BREAKDOWN');for(const d of c.review.days)lines.push(`${d.date} · ${fmt(d.weight)} lb · ${d.status==='Complete'&&c.calculationVersion!=='chris-v1'?'Completed':d.status} · ${d.intakeRecorded===false?'no intake logged':d.status==='Untracked'?'intake unknown':`${d.status==='Unfinished'?'partial ':''}${fmt(d.totals.calories)} kcal; ${fmt(d.totals.protein)} P, ${fmt(d.totals.carbs)} C, ${fmt(d.totals.fat)} F`}`);
  lines.push(`Training: ${c.training.filter(t=>t.completed).length}/${c.training.length} marked complete`);for(const t of c.training){lines.push(`${t.date} ${t.title}: ${t.completed?'Complete':'Not marked complete'}`);if(t.exercises?.length)lines.push('Exercises: '+t.exercises.map(e=>e.name).join(', '));}
- if(c.cardio.rolloverVersion){lines.push(`Cardio performed: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}`,`Cardio credit: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min credited; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Carried credit is not another performed session.`);}
+ if(c.cardio.rolloverVersion==='saved-minutes-v2'){lines.push(`Cardio entered: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} entries; ${c.cardio.target?.category??'category unset'}`,`Cardio total: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Includes saved future-dated minutes; carried credit is not another entry.`);}
+ else if(c.cardio.rolloverVersion){lines.push(`Cardio performed: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}`,`Cardio credit: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min credited; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Carried credit is not another performed session.`);}
  else lines.push(`Cardio: ${fmt(c.cardio.minutes)} / ${fmt(c.cardio.target?.weekly)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}; ${c.cardio.target?fmt(Math.abs(c.cardio.target.weekly-c.cardio.minutes))+(c.cardio.minutes>c.cardio.target.weekly?' extra':' remaining'):'target unset'}`);
  for(const v of c.cardio.targetVersions)lines.push(`Cardio target effective ${v.effective}: ${fmt(v.weekly)} min/week; ${v.category}`);
  for(const t of c.stepTargets)lines.push(`Step target ${t.date}: ${fmt(t.target?.target)} (effective ${t.target?.effective??'unset'})`);
@@ -361,14 +368,15 @@ export function validate(s){
   assert(JSON.stringify(c.change)===JSON.stringify(change(c.previousWeight.value,c.weight.value)),'Invalid saved weight comparison.');
   assert(Array.isArray(c.reviewedPlans)&&Array.isArray(c.training)&&Array.isArray(c.stepTargets)&&Array.isArray(c.stepTotals)&&c.cardio&&Array.isArray(c.cardio.sessions)&&Array.isArray(c.cardio.targetVersions),'Incomplete saved activity/plan snapshot.');
   if(c.cardio.rolloverVersion!==undefined){
-   const b=c.cardio;assert(b.rolloverVersion==='surplus-v1','Unsupported cardio rollover calculation.');date(b.rolloverFrom);date(b.asOfDate);assert(weekStart(b.rolloverFrom)===b.rolloverFrom,'Invalid rollover start.');assert(Array.isArray(b.rolloverHistory),'Missing saved rollover history.');
+   const b=c.cardio,savedMinutes=b.rolloverVersion==='saved-minutes-v2';assert(['surplus-v1','saved-minutes-v2'].includes(b.rolloverVersion),'Unsupported cardio rollover calculation.');date(b.rolloverFrom);date(b.asOfDate);assert(weekStart(b.rolloverFrom)===b.rolloverFrom,'Invalid rollover start.');assert(Array.isArray(b.rolloverHistory),'Missing saved rollover history.');
    let incoming=0,expectedWeek=b.rolloverFrom;
    for(const w of [...b.rolloverHistory,b]){
     date(w.from);date(w.to);assert(weekStart(w.from)===w.from&&w.to===addDays(w.from,6),'Invalid saved cardio week.');
     if(w!==b){assert(w.from===expectedWeek&&w.to<b.from&&w.to<b.asOfDate,'Invalid closed-week rollover history.');expectedWeek=addDays(w.from,7);}
     checkNum(w.minutes,'performed minutes');checkNum(w.carriedIn,'carried minutes');checkNum(w.creditedMinutes,'credited minutes');checkNum(w.carryOut,'outgoing minutes');
     assert(w.carriedIn===(w.from>=b.rolloverFrom?incoming:0),'Invalid incoming cardio credit.');
-    assert(Array.isArray(w.sessions)&&w.sessions.every(x=>x.completed&&x.date>=w.from&&x.date<=w.to&&x.date<=b.asOfDate),'Invalid source cardio sessions.');
+    assert(Array.isArray(w.sessions)&&w.sessions.every(x=>x.date>=w.from&&x.date<=w.to&&(savedMinutes||x.completed&&x.date<=b.asOfDate)),'Invalid source cardio sessions.');
+    if(savedMinutes)assert(countedCardioSessions(w.sessions).length===w.sessions.length,'Duplicate legacy day amounts in saved cardio.');
     assert(w.minutes===w.sessions.reduce((a,x)=>a+x.minutes,0)&&w.creditedMinutes===w.minutes+w.carriedIn,'Cardio credit is not unique performed minutes plus incoming credit.');
     const balance=w.target?minuteDifference(w.creditedMinutes,w.target.weekly):null;
     assert(w.remaining===(w.target?Math.max(0,-balance):null),'Invalid saved cardio remaining minutes.');
@@ -393,7 +401,7 @@ export function validate(s){
   }
   nested.plans=[...c.reviewedPlans.map(x=>x.plan).filter(Boolean),...(c.nextPlan?[c.nextPlan]:[])].filter((p,i,a)=>a.findIndex(x=>x.id===p.id)===i);nested.cardioSessions=[...(c.cardio.rolloverHistory??[]).flatMap(w=>w.sessions),...c.cardio.sessions];nested.cardioCredits=c.cardio.credits??[];nested.cardioTargets=c.cardio.targetVersions;nested.stepTotals=c.stepTotals;nested.trainingSchedules=c.trainingSchedules??[];nested.trainingOccurrences=c.training.map(t=>({...t,createdAt:t.createdAt??c.createdAt}));
   validate(nested);
-  assert(c.cardio.minutes===c.cardio.sessions.filter(x=>x.completed).reduce((a,x)=>a+x.minutes,0),'Invalid saved cardio minutes.');
+  assert(c.cardio.minutes===c.cardio.sessions.filter(x=>c.cardio.rolloverVersion==='saved-minutes-v2'||x.completed).reduce((a,x)=>a+x.minutes,0),'Invalid saved cardio minutes.');
  }
 
  for(const x of s.exportedSnapshots)assert(typeof x.text==='string'&&s.checkins.some(c=>c.id===x.checkinId),'Missing exported check-in.');

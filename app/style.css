@@ -402,6 +402,3 @@ button,a,input,select,textarea,summary{scroll-margin-block:20px calc(var(--nav-h
 .cardio-day>span:first-child{display:block}
 .cardio-day:hover:enabled{background:var(--surface)}
 .cardio-day:disabled{cursor:default;opacity:.65}
-
-.cardio-pending .day-mark{border-bottom-style:dashed}
-.cardio-confirm{display:block;font-size:.75rem;color:var(--accent);line-height:1.5;margin-top:4px}
