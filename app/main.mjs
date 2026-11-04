@@ -219,14 +219,16 @@ function splitExercisePicker(workoutId){
  splitPicker={workoutId,selected:new Set(day.exercises.map(e=>e.id))};
  modal('Choose Exercises',`<p class="caption">${h(day.title||'New Workout')} · ${weekdays[day.weekday]}</p><label>Search Library<input id="split-exercise-search" type="search" placeholder="Find an exercise" autocomplete="off"></label><div id="split-exercise-results"></div>`,{editor:true,footer:button('Use Selected Exercises','apply-split-exercises','','primary')});splitExerciseResults();
 }
+const exerciseNameOrder=(a,b)=>a.name.localeCompare(b.name,'en-CA',{sensitivity:'base',numeric:true})||a.id.localeCompare(b.id);
 function splitExerciseResults(){
  const query=$('#split-exercise-search').value.toLowerCase(),day=splitDraft.days.find(d=>d.id===splitPicker.workoutId),prior=new Set(day.exercises.map(e=>e.id));
- const rows=state.exercises.filter(e=>(!e.archived||prior.has(e.id))&&e.name.toLowerCase().includes(query)).sort((a,b)=>a.name.localeCompare(b.name));
+ const rows=state.exercises.filter(e=>(!e.archived||prior.has(e.id))&&e.name.toLowerCase().includes(query)).sort(exerciseNameOrder);
  $('#split-exercise-results').innerHTML=rows.length?rows.map(e=>`<label class="check-row split-choice"><input type="checkbox" data-split-choice="${h(e.id)}" ${splitPicker.selected.has(e.id)?'checked':''}><span>${h(e.name)}${e.archived?' <small>(Archived)</small>':''}</span></label>`).join(''):'<p class="empty">No matching exercises. You can add exercises in the Exercise Library.</p>';
 }
 function applySplitExercises(){
  const day=splitDraft.days.find(d=>d.id===splitPicker.workoutId),selected=splitPicker.selected,prior=new Set(day.exercises.map(e=>e.id));
  day.exercises=[...day.exercises.filter(e=>selected.has(e.id)),...[...selected].filter(id=>!prior.has(id)).map(id=>{const e=state.exercises.find(e=>e.id===id&&!e.archived);D.assert(e,'Exercise is unavailable.');return {id:e.id,name:e.name};})];
+ day.exercises.sort(exerciseNameOrder);
  const workoutId=day.id;splitSheet(true);dialog.querySelector(`[data-action="split-exercises"][data-value="${CSS.escape(workoutId)}"]`)?.focus({preventScroll:true});
 }
 function cancelSheet(){if(splitPicker){splitSheet(true);return;}close();}

@@ -50,4 +50,6 @@ The Training cardio day row displays actual minutes logged on each date, includi
 
 Edit Split opens a compact list of workouts; expand one workout to change its name, weekday and ordered exercises. Choose Exercises provides searchable multi-selection and returns to the same draft. Cancel in that picker leaves prior selections intact. Exercise options hold reordering/removal, and workout removal has Undo. Applies From keeps the effective date visible while its editor stays expandable. Saving still appends a schedule version and preserves earlier checkmarks and snapshots.
 
+Applying an exercise selection sorts that workout's exercises alphabetically, matching the picker and ignoring letter case. Numbered names use natural order (Exercise 2 before Exercise 10). Move Up/Down remains available afterward. Viewing existing splits does not reorder saved schedules or historical checkmarks.
+
 Sheets use one scrollable content area with a fixed header; Edit Split and its picker also keep their main action in a fixed footer. The background page is locked only while the sheet is open and restored afterward. Reordering retains the current scroll position, controls use sheet-specific focus spacing, and viewport resizing keeps the footer reachable. No storage schema changes are required.
