@@ -5,7 +5,7 @@ test('v1 migration adds empty new collections; every existing record and snapsho
  const old=D.emptyStore();delete old.plannedEntries;delete old.exercises;old.schemaVersion=1;const f=food();old.foods.push(f);old.entries.push(D.makeEntry(f,60,'g','2026-11-01','08:00'));old.weights.push({...D.stamp(),date:'2026-11-01',lb:132});old.plans.push({...D.stamp(),effective:'2026-11-01',...D.calculateTargets(1800,132),goal:{unit:'lb',value:1}});
  // Build a real old-style snapshot without rewriting any snapshot field in migration.
  const compatible=D.migrateStore(old);old.checkins.push(D.buildCheckin(compatible,'2026-11-01'));const before=JSON.stringify(old),upgraded=D.migrateStore(old);
- assert.equal(JSON.stringify(old),before);assert.equal(upgraded.schemaVersion,3);assert.deepEqual(upgraded.plannedEntries,[]);assert.deepEqual(upgraded.exercises,[]);for(const k of Object.keys(old))if(k!=='schemaVersion')assert.deepEqual(upgraded[k],old[k],k);assert.deepEqual(D.migrateStore(upgraded),upgraded);assert.deepEqual(D.parseBackup(before),upgraded);
+ assert.equal(JSON.stringify(old),before);assert.equal(upgraded.schemaVersion,D.VERSION);assert.deepEqual(upgraded.plannedEntries,[]);assert.deepEqual(upgraded.exercises,[]);for(const k of Object.keys(old))if(k!=='schemaVersion')assert.deepEqual(upgraded[k],old[k],k);assert.deepEqual(D.migrateStore(upgraded),upgraded);assert.deepEqual(D.parseBackup(before),upgraded);
  const bad=D.clone(old);bad.entries[0].nutrition.calories=0;assert.throws(()=>D.migrateStore(bad),/snapshot/);assert.equal(bad.schemaVersion,1);assert.throws(()=>D.migrateStore({...old,plannedEntries:[]}),/Unexpected/);
 });
 test('planning is excluded from all actual totals, Complete-only averages, status and saved exports',()=>{

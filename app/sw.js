@@ -1,5 +1,5 @@
-const CACHE='chris-logbook-stage-brand-v9';
-const FILES=['./','./index.html','./style.css','./main.mjs','./domain.mjs','./storage.mjs','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./fonts/BarlowCondensed-BoldItalic.ttf'];
+const CACHE='chris-logbook-canadian-foods-v10';
+const FILES=['./','./index.html','./style.css','./main.mjs','./domain.mjs','./storage.mjs','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./fonts/BarlowCondensed-BoldItalic.ttf','./catalog.mjs','./data/cnf-2015.json'];
 const ASSETS=new Set(FILES.map(path=>new URL(path,self.location.href).pathname));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(path=>new Request(new URL(path,self.location.href),{cache:'reload'}))))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('chris-logbook-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
@@ -12,8 +12,8 @@ self.addEventListener('fetch',event=>{
   try{
    const response=await fetch(event.request,{cache:'no-cache'});
    const type=response.headers.get('content-type')??'';
-   const isScript=/\.mjs$/.test(url.pathname),isStyle=/\.css$/.test(url.pathname);
-   const validType=isScript?/javascript/.test(type):isStyle?/text\/css/.test(type):true;
+   const isScript=/\.mjs$/.test(url.pathname),isStyle=/\.css$/.test(url.pathname),isJson=/\.json$/.test(url.pathname);
+   const validType=isScript?/javascript/.test(type):isStyle?/text\/css/.test(type):isJson?/application\/json/.test(type):true;
    // A redirected sign-in page must not overwrite a cached app asset.
    if(response.ok&&!response.redirected&&validType){const cache=await caches.open(CACHE);await cache.put(event.request,response.clone());return response;}
    return cached??response;

@@ -1,5 +1,5 @@
 // All arithmetic uses stored precision. Display rounding belongs to the UI.
-export const VERSION = 3;
+export const VERSION = 4;
 export const TABLES = ['foods','entries','weights','statuses','plans','phases','checkins','exportedSnapshots','cardioTargets','cardioSessions','cardioCredits','trainingSchedules','trainingOccurrences','stepTargets','stepTotals','favourites','plannedEntries','exercises'];
 export const NUTRIENTS = ['calories','protein','carbs','fat','fibre','sugar','sodium'];
 export const REQUIRED = ['calories','protein','carbs','fat'];
@@ -29,6 +29,7 @@ export function migrateStore(input){
  const s=clone(input);
  if(s?.schemaVersion===1){assert(!Object.hasOwn(s,'plannedEntries'),'Unexpected planning data in a version 1 backup.');s.plannedEntries=[];s.schemaVersion=2;}
  if(s?.schemaVersion===2){assert(!Object.hasOwn(s,'exercises'),'Unexpected exercise data in a version 2 backup.');s.exercises=[];s.schemaVersion=3;}
+ if(s?.schemaVersion===3)s.schemaVersion=4;
  return validate(s);
 }
 export function latest(records,d){return records.filter(x=>x.effective<=d).sort((a,b)=>a.effective.localeCompare(b.effective)||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)).at(-1)??null;}
@@ -55,13 +56,36 @@ export function calculateTargets(calories,reference,overrides={}){
 }
 export function nutrients(input){return Object.fromEntries(NUTRIENTS.map(k=>[k,number(input[k],k,{optional:!REQUIRED.includes(k)})]));}
 export function makeFood(input,previous=null){
+ assert(!previous||previous.source==='Custom','Save a separate custom copy to change a government food.');
  const name=String(input.name??'').trim();assert(name,'Food name is required.');assert(['g','mL','piece','cup','serving'].includes(input.unit),'Choose a valid serving unit.');
- return {...stamp(),...(previous?{id:previous.id,createdAt:previous.createdAt}:{}),updatedAt:new Date().toISOString(),name,brand:String(input.brand??'').trim(),quantity:number(input.quantity,'Serving quantity',{positive:true}),unit:input.unit,grams:input.unit==='g'?number(input.quantity,'Serving grams',{positive:true}):number(input.grams,'Serving gram weight',{positive:true,optional:true}),nutrition:nutrients(input),source:'Custom',archived:previous?.archived??false,household:String(input.household??''),barcode:String(input.barcode??'')};
+ return {...stamp(),...(previous?{id:previous.id,createdAt:previous.createdAt}:{}),updatedAt:new Date().toISOString(),name,brand:String(input.brand??'').trim(),quantity:number(input.quantity,'Serving quantity',{positive:true}),unit:input.unit,grams:input.unit==='g'?number(input.quantity,'Serving grams',{positive:true}):number(input.grams,'Serving gram weight',{positive:true,optional:true}),nutrition:nutrients(input),source:'Custom',archived:previous?.archived??false,household:String(input.household??''),barcode:String(input.barcode??''),...(previous?.copiedFrom||input.copiedFrom?{copiedFrom:clone(previous?.copiedFrom??input.copiedFrom)}:{})};
+}
+export function validateFood(f){
+ assert(f&&typeof f.name==='string'&&f.name.trim(),'Invalid food name.');assert(typeof f.quantity==='number'&&Number.isFinite(f.quantity)&&f.quantity>0,'Invalid serving quantity.');assert(['g','mL','piece','cup','serving'].includes(f.unit),'Invalid serving unit.');if(f.grams!=null)assert(typeof f.grams==='number'&&Number.isFinite(f.grams)&&f.grams>0,'Invalid gram conversion.');
+ assert(f.nutrition&&typeof f.nutrition==='object','Missing nutrition.');for(const key of NUTRIENTS){const value=f.nutrition[key];if(!REQUIRED.includes(key)&&value==null)continue;assert(typeof value==='number'&&Number.isFinite(value)&&value>=0,`Invalid ${key}.`);}
+ assert(['Custom','Canadian Nutrient File'].includes(f.source),'Unsupported food source.');
+ if(f.source==='Canadian Nutrient File'){
+  assert(f.readOnly===true&&f.unit==='g'&&f.quantity===100&&f.grams===100,'Invalid government food profile.');const p=f.provenance;
+  assert(p?.dataset==='Canadian Nutrient File'&&p.version==='2015'&&typeof p.foodId==='string'&&p.foodId&&typeof p.foodCode==='string'&&f.id===`cnf-${p.version}-${p.foodCode}`&&typeof p.originalDescription==='string'&&p.originalDescription,'Missing Canadian food provenance.');
+  const units={calories:['208','kCal'],protein:['203','g'],carbs:['205','g'],fat:['204','g'],fibre:['291','g'],sugar:['269','g'],sodium:['307','mg']};
+  for(const [key,[id,unit]]of Object.entries(units)){if(f.nutrition[key]==null)continue;assert(p.nutrients?.[key]?.id===id&&p.nutrients[key].unit===unit,'Invalid Canadian nutrient units or energy field.');}
+  assert(Array.isArray(f.portions),'Missing source measures.');const ids=new Set();for(const measure of f.portions){assert(typeof measure.id==='string'&&!ids.has(measure.id)&&typeof measure.label==='string'&&measure.label,'Invalid source measure.');ids.add(measure.id);assert(typeof measure.grams==='number'&&Number.isFinite(measure.grams)&&measure.grams>0,'Invalid measure conversion.');}
+ }
+ return f;
+}
+export function keepFoodReference(s,food){
+ validateFood(food);assert(food.source==='Canadian Nutrient File','Expected a government food.');const previous=s.foods.find(f=>f.id===food.id),saved={...clone(food),...(previous?{createdAt:previous.createdAt}:{})};
+ s.foods=s.foods.filter(f=>f.id!==food.id);s.foods.push(saved);return saved;
+}
+export function portionLabel(food,quantity,unit){
+ if(unit.startsWith('measure:'))return `${quantity} × ${food.portions?.find(p=>p.id===unit.slice(8))?.label??'Source Measure'}`;
+ return `${quantity} ${unit==='serving'?'servings':unit}`;
 }
 export function scale(profile,ratio){return Object.fromEntries(NUTRIENTS.map(k=>[k,profile[k]==null?null:profile[k]*ratio]));}
 export function portion(food,quantity,unit){
  quantity=number(quantity,'Amount',{positive:true});let factor;
  if(unit==='serving')factor=quantity;
+ else if(unit.startsWith('measure:')){const measure=food.portions?.find(p=>p.id===unit.slice(8));assert(measure&&food.grams>0,'No conversion is known for this measure.');factor=quantity*measure.grams/food.grams;}
  else if(unit===food.unit)factor=quantity/food.quantity;
  else if(unit==='g'&&food.grams!=null)factor=quantity/food.grams;
  else throw new Error('No conversion is known for this unit. Do not treat mL as grams.');
@@ -206,10 +230,11 @@ export function validate(s){
  const checkNum=(v,label,positive=false)=>{assert(typeof v==='number'&&Number.isFinite(v)&&(positive?v>0:v>=0),`Invalid ${label}.`);};
  const checkNutrition=n=>{assert(n&&typeof n==='object','Missing nutrition.');for(const k of NUTRIENTS){if(!REQUIRED.includes(k)&&n[k]==null)continue;checkNum(n[k],k);}};
  for(const t of TABLES){assert(Array.isArray(s[t]),`Missing ${t}.`);const seen=new Set();for(const r of s[t]){assert(r&&typeof r.id==='string'&&r.id&&!seen.has(r.id),`Invalid or duplicate ${t} ID.`);seen.add(r.id);assert(typeof r.createdAt==='string'&&Number.isFinite(Date.parse(r.createdAt)),`Invalid ${t} timestamp.`);if('date'in r||requiredDates.has(t))date(r.date);if('effective'in r||requiredEffective.has(t))date(r.effective);}}
- for(const f of s.foods){assert(typeof f.name==='string'&&f.name.trim(),'Invalid food name.');checkNum(f.quantity,'serving',true);assert(['g','mL','piece','cup','serving'].includes(f.unit),'Invalid serving unit.');if(f.grams!=null)checkNum(f.grams,'gram conversion',true);checkNutrition(f.nutrition);assert(f.source==='Custom','Unsupported food source in this milestone.');}
+ for(const f of s.foods)validateFood(f);
+
  const recordedIds=new Set(s.entries.map(x=>x.id));
  for(const e of s.plannedEntries)assert(!recordedIds.has(e.id),'A food entry cannot be both planned and recorded.');
- for(const e of [...s.entries,...s.plannedEntries]){assert(typeof e.name==='string'&&e.name.trim(),'Invalid entry name.');assert(/^([01]\d|2[0-3]):[0-5]\d$/.test(e.time),'Invalid entry time.');checkNum(e.quantity,'entry quantity',true);checkNutrition(e.nutrition);assert(e.snapshot&&typeof e.snapshot.name==='string','Missing historical food snapshot.');checkNutrition(e.snapshot.nutrition);const expected=portion(e.snapshot,e.quantity,e.unit);for(const k of NUTRIENTS)assert(expected.nutrition[k]===e.nutrition[k]||Math.abs(expected.nutrition[k]-e.nutrition[k])<1e-9,'Entry nutrition does not match its snapshot.');}
+ for(const e of [...s.entries,...s.plannedEntries]){assert(typeof e.name==='string'&&e.name.trim(),'Invalid entry name.');assert(/^([01]\d|2[0-3]):[0-5]\d$/.test(e.time),'Invalid entry time.');checkNum(e.quantity,'entry quantity',true);checkNutrition(e.nutrition);assert(e.snapshot&&typeof e.snapshot.name==='string','Missing historical food snapshot.');checkNutrition(e.snapshot.nutrition);validateFood(e.snapshot);const expected=portion(e.snapshot,e.quantity,e.unit);for(const k of NUTRIENTS)assert(expected.nutrition[k]===e.nutrition[k]||Math.abs(expected.nutrition[k]-e.nutrition[k])<1e-9,'Entry nutrition does not match its snapshot.');}
  const unique=(rows,key,label)=>{const keys=rows.map(key);assert(new Set(keys).size===keys.length,`Duplicate ${label}.`);};
  unique(s.weights,x=>x.date,'weight date');for(const w of s.weights)checkNum(w.lb,'weight',true);
  unique(s.statuses,x=>x.date,'diary status date');for(const r of s.statuses)assert(['Complete','Unfinished','Untracked'].includes(r.status),'Invalid diary status.');

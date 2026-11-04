@@ -270,3 +270,29 @@ textarea{width:100%}.split-row{border-bottom:1px solid var(--line);padding-botto
 /* The title uses a locally bundled, licensed display face; controls keep the system font. */
 @font-face{font-family:'Barlow Condensed';src:url('./fonts/BarlowCondensed-BoldItalic.ttf') format('truetype');font-style:italic;font-weight:700;font-display:swap}
 .wordmark{font-family:'Barlow Condensed',system-ui,sans-serif;font-weight:700;font-style:italic;font-size:1.625rem;line-height:1.1;letter-spacing:.035em;text-transform:uppercase;color:var(--accent);min-width:0;overflow-wrap:anywhere}
+
+/* Food logging: one tappable result, then amount and save. */
+.food-filters{display:flex;gap:8px;margin-block:16px;flex-wrap:wrap}
+.food-filters button{min-height:44px;padding:8px 12px;border:1px solid var(--control);border-radius:6px;font-size:.9375rem}
+.food-filters button[aria-pressed="true"]{background:var(--accent);color:var(--ink);border-color:var(--accent);font-weight:650}
+.food-choice{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:76px;padding:20px 0;border-bottom:1px solid var(--line);text-align:left}
+.food-choice>span:first-child{min-width:0;flex:1}
+.food-choice strong{display:block;font-size:1rem;line-height:1.5;font-weight:600;overflow-wrap:anywhere}
+.food-choice small{display:block;font-size:.875rem;margin-top:6px;line-height:1.5}
+.food-choice-calories{flex-shrink:0;min-width:3rem;text-align:right;font-size:1.125rem}
+.food-choice-calories small{margin-top:2px}
+.food-tools{display:flex;gap:16px 24px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px;margin-top:16px}
+.food-search-empty{padding-block:16px;color:var(--muted)}
+.portion-name{font-size:1.125rem;font-weight:600;line-height:1.5;margin-block:0 20px;overflow-wrap:anywhere}
+.food-form-grid{margin-block:20px;gap:16px}
+.portion-total{display:grid;gap:8px;margin:24px 0;line-height:1.6}
+.portion-total strong{font-size:1.5rem;font-weight:600}
+.portion-total span{color:var(--muted);font-size:.9375rem}
+.food-extra{border-top:1px solid var(--line);margin-top:20px;padding-top:4px}
+.food-extra summary{font-size:.9375rem}
+.food-extra .form-grid{margin-block:16px}
+.food-detail-actions{display:flex;gap:12px 24px;flex-wrap:wrap}
+.entry-actions{gap:24px;align-items:flex-start;margin-top:8px}
+.entry-more{margin:0}.entry-more summary{min-height:44px;padding:8px 2px;font-size:.9375rem}
+.entry-more>div{display:flex;gap:24px;flex-wrap:wrap}
+form[data-form="portion"]>.primary{margin-top:20px;margin-bottom:24px}

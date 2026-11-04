@@ -1,0 +1,12 @@
+Canadian Nutrient File, Health Canada, 2015.
+
+The Canadian Nutrient File may be used for commercial and non-commercial use without further permission. The source copyright guidelines request due diligence in ensuring accuracy, preservation of nutrient values (conversion from the 100 g basis to other serving sizes is allowed), and identification of Health Canada as the source.
+
+The CNF is provided "as is" without warranty or condition of any kind, including implied warranties or conditions of merchantable quality and fitness for a particular purpose. Health Canada does not warrant that the CNF is error-free.
+
+This app is an independent reproduction, not an official version, and is not affiliated with or endorsed by Health Canada. The CNF is a reference tool, not medical advice.
+
+Government food profiles retain the published values. An edited custom copy is a separate Custom record and must not be represented as an unchanged government record.
+
+Source: CNF 2015 users' guide, Copyright Guidelines for the Canadian Nutrient File.
+https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/nutrient-data/canadian-nutrient-file-about-us.html
