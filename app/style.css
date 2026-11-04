@@ -321,3 +321,25 @@ button,a,input,select,textarea,summary{scroll-margin-block:20px calc(var(--nav-h
 .step-card{border-bottom:0}
 .goals-card{border-bottom:0;padding-bottom:24px}
 .checkin-review{margin-top:0}
+
+/* Weekly review: a single date control, two medians and one signed change. */
+.weekly-review-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.weekly-weight{padding-bottom:8px}
+.weekly-medians{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,6.5rem),1fr));gap:20px;margin:20px 0}
+.weekly-medians dt{color:var(--muted);font-size:.9375rem;line-height:1.5}
+.weekly-medians dd{margin:8px 0 0;line-height:1.4}
+.weekly-medians strong{font-size:1.75rem;font-weight:550;line-height:1.2}
+.weekly-medians .unit{font-size:.9375rem;color:var(--muted)}
+.weekly-sample{display:block;font-size:.875rem;line-height:1.5;color:var(--muted);margin-top:8px}
+.weekly-change{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px 16px;padding:14px 0;border-block:1px solid var(--line);line-height:1.5}
+.weekly-change>span{color:var(--muted);font-size:.9375rem}
+.weekly-change strong{font-size:1.25rem;color:var(--accent);font-weight:650;overflow-wrap:anywhere}
+.weekly-weight-details{margin:8px 0 0}
+.weekly-context{margin:0 0 16px}
+.weekly-context .row{display:block;padding:10px 0}
+.weekly-context dt{font-size:.875rem;color:var(--muted);line-height:1.5}
+.weekly-context dd{margin:4px 0 0;font-size:.9375rem;line-height:1.6}
+.weekly-plan{margin:0;padding:16px 0;border-bottom:1px solid var(--line)}
+.weekly-plan>.primary,.weekly-plan>.secondary{margin-block:12px}
+.weekly-save{display:grid;gap:12px;margin-top:24px}
+.weekly-save>.caption{margin:0}

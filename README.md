@@ -39,3 +39,5 @@ For source selection, nutrient units, source energy, copyright notices, reproduc
 Food Day Status now offers Completed (default) and Untracked. Empty defaults do not count as zero intake or dilute averages; Record Zero Intake is an optional explicit confirmation. See [Day Status](docs/DAY-STATUS.md) for migration and historical-review behavior.
 
 The usability pass places backup/restore first in Settings and weekly review before the weight chart; groups less-used workout actions; and keeps enlarged navigation clear of content and Undo.
+
+Weekly Review uses one date control, a compact two-median comparison and a signed pound change. Weight windows, percentage change, intended loss, food/activity review and target editing stay available in expandable sections. The date chooser commits only a valid past Sunday, so an invalid draft cannot disagree with the displayed comparison. This layout update does not change stored records or saved reviews.
