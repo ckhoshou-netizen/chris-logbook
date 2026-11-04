@@ -18,6 +18,10 @@ Personal records live in device IndexedDB, not GitHub or ChatGPT. Keep complete 
 
 The app code has been checked for relative asset URLs and remote API/key dependencies. Actual iPhone installation and storage behavior must be verified on the target phone. This is an installable web app; a native App Store release is outside the current build.
 
+## Navigation
+
+Nutrition contains the food diary and food planning. Training contains the workout split, exercise library, cardio and steps. Check-in contains daily weights, weight trends, current goals and the weekly Sunday review. Existing Today, Trends and Sunday links still open the corresponding destination. This navigation update does not change the database schema, records or saved snapshots.
+
 ## Development checks
 
 Run `npm ci` then `npm test` with Node.js 22 or later. Tests use synthetic records and check calculations, immutable history, storage migrations, backup/restore, food planning, exercise assignments, cardio rollover and saved weight comparisons. GitHub Pages serves app/ directly; no build tool or runtime service is required.

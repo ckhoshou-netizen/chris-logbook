@@ -247,3 +247,15 @@ textarea{width:100%}.split-row{border-bottom:1px solid var(--line);padding-botto
 
 .weight-delta{padding:20px 0;border-block:1px solid var(--line);margin:24px 0 8px}
 .weight-delta>strong{display:block;font-size:1.75rem;color:var(--accent);margin:12px 0;font-weight:650}
+
+/* Three task-based destinations, with a clear selected state beyond colour. */
+.bottom-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px 12px max(10px,env(safe-area-inset-bottom))}
+.bottom-nav a{min-width:0;min-height:52px;padding:10px 6px;border:1px solid transparent;border-radius:7px;line-height:1.4;overflow-wrap:anywhere;text-align:center}
+.bottom-nav a[aria-current]{background:var(--accent);color:var(--ink);border-color:var(--accent);font-weight:700;text-decoration:none}
+.goals-card>.secondary{margin-top:24px}
+.weight-trends>.section-title{margin-top:32px}
+.checkin-review{margin-top:32px;padding-block:16px;border-block:1px solid var(--line)}
+.checkin-review>summary{font-weight:650}
+.checkin-review[open]>summary{margin-bottom:24px}
+.checkin-review>label{margin-top:24px}
+@media(forced-colors:active){.bottom-nav a[aria-current]{border:2px solid ButtonText}}
