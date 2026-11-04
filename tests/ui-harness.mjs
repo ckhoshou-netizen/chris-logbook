@@ -1,0 +1,9 @@
+import vm from 'node:vm';import fs from 'node:fs';import * as Domain from '../app/domain.mjs';
+const source=fs.readFileSync(new URL('../app/main.mjs',import.meta.url),'utf8').replace(/^import .*\n/gm,'').replace(/\nstart\(\);\s*$/,'');
+export function ui(s,d='2026-11-04',clock='2026-11-03'){
+ const listeners={},nodes=new Map();
+ const node=key=>{if(!nodes.has(key))nodes.set(key,{innerHTML:'',textContent:'',open:false,value:'',insertAdjacentHTML(position,html){this.innerHTML+=html;},addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){}});return nodes.get(key);};
+ const context={D:{...Domain,today:()=>clock},readStore:async()=>s,updateStore:async fn=>{const draft=Domain.clone(s);fn(draft);Domain.validate(draft);Object.assign(s,draft);return draft;},structuredClone,Intl,Date,Number,String,Math,Set,Map,URL,console,Blob,FormData:class{constructor(form){return new Map(Object.entries(form.values));}},clearTimeout,setTimeout:()=>0,document:{querySelector:node,querySelectorAll:()=>[],addEventListener:(name,callback)=>listeners[name]=callback},window:{addEventListener(){},scrollTo(){}},location:{hash:'#today'},navigator:{},BroadcastChannel:class{close(){}},CSS:{escape:x=>x}};
+  // A single context retains lexical state and the event handlers under test.
+ const c=vm.createContext({...context,__store:s,__date:d});vm.runInContext(source+`\nstate=__store;selectedDate=__date;reviewDate='2026-11-01';globalThis.api={todayScreen,sundayScreen,trendsScreen,cardioBudgetText,foodEntryHTML,statusControl,submit,action,splitSheet,splitRow,exerciseLibrary,exerciseSheet,workoutExercises,readSplitDraft,getSplitDraft:()=>splitDraft,setEditing:value=>{editing=value;}};`,c);return {api:c.api,context:c,nodes,node,listeners};
+}
