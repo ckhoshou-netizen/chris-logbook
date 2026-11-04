@@ -150,6 +150,35 @@ details{margin:10px 0}
 .preview-note{font-size:.875rem;color:var(--muted);margin:24px 0 4px;line-height:1.5}
 dialog{position:fixed;top:auto;bottom:0;margin:0 auto;width:min(100%,430px);max-height:90dvh;overflow:auto;border:1px solid var(--control);background:var(--bg);color:var(--text);border-radius:10px 10px 0 0;padding:20px 22px max(24px,env(safe-area-inset-bottom))}
 dialog::backdrop{background:#000a}
+/* One scroll area per sheet; the page underneath stays at its original position. */
+.sheet-open{overflow:hidden;overscroll-behavior:none}
+.sheet-open body{position:fixed;top:var(--page-scroll-offset,0);inset-inline:0;width:100%;overflow:hidden}
+#sheet{bottom:var(--sheet-bottom,0px);padding:0;max-height:calc(var(--sheet-height,100dvh) - 16px);overflow:hidden}
+#sheet[open]{display:flex;flex-direction:column}
+#sheet.editor-sheet{height:calc(var(--sheet-height,100dvh) - 16px)}
+#sheet>.sheet-header{position:relative;z-index:1;flex-shrink:0;margin:0;padding:16px 22px;border-bottom:1px solid var(--line);background:var(--bg)}
+#sheet-content{position:relative;z-index:0;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;padding:20px 22px max(28px,env(safe-area-inset-bottom));scroll-padding-block:16px 24px}
+.editor-sheet #sheet-content{flex:1}
+#sheet-footer{position:relative;z-index:1;flex-shrink:0;border-top:1px solid var(--line);padding:12px 22px max(12px,env(safe-area-inset-bottom));background:var(--bg)}
+#sheet :is(button,a,input,select,textarea,summary){scroll-margin-block:16px}
+.split-intro{margin:0 0 16px}
+details.split-row{margin:0;padding:0;border-bottom:1px solid var(--line)}
+.split-row>summary{display:list-item;padding:20px 0;text-decoration:none;line-height:1.5;color:var(--text)}
+.split-row>summary>span{display:inline-grid;gap:4px;vertical-align:middle;max-width:calc(100% - 24px)}
+.split-workout-title{font-size:1rem;overflow-wrap:anywhere}
+.split-workout-meta{font-size:.875rem;color:var(--muted)}
+.split-workout-body{padding:0 0 20px}
+.split-workout-body .form-grid{grid-template-columns:1fr;margin:8px 0 24px}
+.split-workout-body input[name="title"]{padding-right:11px}
+.split-workout-body .assigned-list{margin:8px 0 20px;padding-left:22px}
+.split-workout-body .assigned-list>li{padding:12px 0;line-height:1.5}
+.exercise-actions{margin:4px 0 0}
+.exercise-actions>summary{font-size:.875rem;padding-block:8px;min-height:44px}
+.exercise-actions .exercise-order{margin:0;gap:8px 20px}
+.split-remove{margin-top:16px}
+.split-tools{display:grid;gap:8px;margin-top:24px}
+.split-effective{border-top:1px solid var(--line);padding-top:8px;margin-top:16px}
+.split-choice{padding-block:14px}
 .sheet-header{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
 .sheet-header{flex-wrap:wrap}
 .sheet-header h2{min-width:0;overflow-wrap:anywhere}
