@@ -12,4 +12,4 @@ test('a new worker revalidates every install asset so fresh HTTP caches cannot i
  assert.equal(requests.length,14);for(const request of requests){assert.equal(request.cache,'reload');assert.ok(request.url.startsWith('https://example.test/chris-logbook/'));}
 });
 
-test('HTML errors never replace a cached Canadian food catalogue',async()=>{const {handlers,writes}=setup(new Response('<html>Error</html>',{headers:{'content-type':'text/html'}}));let result;handlers.fetch({request:{url:'https://example.test/data/cnf-2015.json',method:'GET'},respondWith:r=>result=r});assert.equal(await(await result).text(),'cached app');assert.equal(writes.length,0);});
+test('HTML errors never replace a cached Canadian food catalogue',async()=>{const {handlers,writes}=setup(new Response('<html>Error</html>',{headers:{'content-type':'text/html'}}));let result;handlers.fetch({request:{url:'https://example.test/data/cnf-2026.json',method:'GET'},respondWith:r=>result=r});assert.equal(await(await result).text(),'cached app');assert.equal(writes.length,0);});

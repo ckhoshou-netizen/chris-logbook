@@ -1,5 +1,5 @@
 // All arithmetic uses stored precision. Display rounding belongs to the UI.
-export const VERSION = 4;
+export const VERSION = 5;
 export const TABLES = ['foods','entries','weights','statuses','plans','phases','checkins','exportedSnapshots','cardioTargets','cardioSessions','cardioCredits','trainingSchedules','trainingOccurrences','stepTargets','stepTotals','favourites','plannedEntries','exercises'];
 export const NUTRIENTS = ['calories','protein','carbs','fat','fibre','sugar','sodium'];
 export const REQUIRED = ['calories','protein','carbs','fat'];
@@ -30,6 +30,14 @@ export function migrateStore(input){
  if(s?.schemaVersion===1){assert(!Object.hasOwn(s,'plannedEntries'),'Unexpected planning data in a version 1 backup.');s.plannedEntries=[];s.schemaVersion=2;}
  if(s?.schemaVersion===2){assert(!Object.hasOwn(s,'exercises'),'Unexpected exercise data in a version 2 backup.');s.exercises=[];s.schemaVersion=3;}
  if(s?.schemaVersion===3)s.schemaVersion=4;
+ if(s?.schemaVersion===4){
+  // Only live diary labels change. Saved check-ins and exports retain their original version.
+  for(const r of s.statuses){
+   if(r.status==='Complete'&&!s.entries.some(e=>e.date===r.date))r.zeroIntakeConfirmed=true;
+   if(r.status==='Unfinished')r.status='Complete';
+  }
+  s.schemaVersion=5;
+ }
  return validate(s);
 }
 export function latest(records,d){return records.filter(x=>x.effective<=d).sort((a,b)=>a.effective.localeCompare(b.effective)||a.createdAt.localeCompare(b.createdAt)||a.id.localeCompare(b.id)).at(-1)??null;}
@@ -66,10 +74,10 @@ export function validateFood(f){
  assert(['Custom','Canadian Nutrient File'].includes(f.source),'Unsupported food source.');
  if(f.source==='Canadian Nutrient File'){
   assert(f.readOnly===true&&f.unit==='g'&&f.quantity===100&&f.grams===100,'Invalid government food profile.');const p=f.provenance;
-  assert(p?.dataset==='Canadian Nutrient File'&&p.version==='2015'&&typeof p.foodId==='string'&&p.foodId&&typeof p.foodCode==='string'&&f.id===`cnf-${p.version}-${p.foodCode}`&&typeof p.originalDescription==='string'&&p.originalDescription,'Missing Canadian food provenance.');
-  const units={calories:['208','kCal'],protein:['203','g'],carbs:['205','g'],fat:['204','g'],fibre:['291','g'],sugar:['269','g'],sodium:['307','mg']};
+  assert(p?.dataset==='Canadian Nutrient File'&&['2015','2026'].includes(p.version)&&typeof p.foodId==='string'&&p.foodId&&typeof p.foodCode==='string'&&f.id===`cnf-${p.version}-${p.foodCode}`&&typeof p.originalDescription==='string'&&p.originalDescription,'Missing Canadian food provenance.');
+  const units=p.version==='2026'?{calories:['208','kilocalorie'],protein:['203','Gram'],carbs:['205','Gram'],fat:['204','Gram'],fibre:['291','Gram'],sugar:['269','Gram'],sodium:['307','Milligram']}:{calories:['208','kCal'],protein:['203','g'],carbs:['205','g'],fat:['204','g'],fibre:['291','g'],sugar:['269','g'],sodium:['307','mg']};
   for(const [key,[id,unit]]of Object.entries(units)){if(f.nutrition[key]==null)continue;assert(p.nutrients?.[key]?.id===id&&p.nutrients[key].unit===unit,'Invalid Canadian nutrient units or energy field.');}
-  assert(Array.isArray(f.portions),'Missing source measures.');const ids=new Set();for(const measure of f.portions){assert(typeof measure.id==='string'&&!ids.has(measure.id)&&typeof measure.label==='string'&&measure.label,'Invalid source measure.');ids.add(measure.id);assert(typeof measure.grams==='number'&&Number.isFinite(measure.grams)&&measure.grams>0,'Invalid measure conversion.');}
+  assert(Array.isArray(f.portions),'Missing source measures.');const ids=new Set();for(const measure of f.portions){assert(typeof measure.id==='string'&&!ids.has(measure.id)&&typeof measure.label==='string'&&measure.label,'Invalid source measure.');ids.add(measure.id);assert(typeof measure.grams==='number'&&Number.isFinite(measure.grams)&&measure.grams>0,'Invalid measure conversion.');if(p.version==='2026')assert(measure.measureTypeCode==='6','Refuse and yield measures cannot be logged as portions.');}
  }
  return f;
 }
@@ -111,12 +119,13 @@ export function confirmPlannedEntry(s,plannedId,changes={},currentDate=today(s.s
  s.plannedEntries=s.plannedEntries.filter(x=>x.id!==plannedId);s.entries.push(actual);return actual;
 }
 export function totals(entries){return Object.fromEntries(NUTRIENTS.map(k=>[k,entries.length&&entries.some(e=>e.nutrition[k]==null)?null:entries.reduce((sum,e)=>sum+(e.nutrition[k]??0),0)]));}
-export function dayStatus(s,d){return s.statuses.find(x=>x.date===d)?.status??'Unfinished';}
+export function dayStatus(s,d){return s.statuses.find(x=>x.date===d)?.status??'Complete';}
+export function hasRecordedIntake(s,d){return s.entries.some(e=>e.date===d)||s.statuses.some(r=>r.date===d&&r.status==='Complete'&&r.zeroIntakeConfirmed===true);}
 export function diaryReview(s,from,to){
- const days=dates(from,to).map(d=>({date:d,status:dayStatus(s,d),weight:s.weights.find(w=>w.date===d)?.lb??null,totals:totals(s.entries.filter(e=>e.date===d)),plan:clone(latest(s.plans,d))}));
- const complete=days.filter(d=>d.status==='Complete'),counts=Object.fromEntries(['Complete','Unfinished','Untracked'].map(k=>[k,days.filter(d=>d.status===k).length]));
+ const days=dates(from,to).map(d=>{const intakeRecorded=hasRecordedIntake(s,d);return {date:d,status:dayStatus(s,d),intakeRecorded,weight:s.weights.find(w=>w.date===d)?.lb??null,totals:intakeRecorded?totals(s.entries.filter(e=>e.date===d)):Object.fromEntries(NUTRIENTS.map(k=>[k,null])),plan:clone(latest(s.plans,d))};});
+ const complete=days.filter(d=>d.status==='Complete'&&d.intakeRecorded),counts=Object.fromEntries(['Complete','Untracked'].map(k=>[k,days.filter(d=>d.status===k).length]));
  const average=complete.length?Object.fromEntries(NUTRIENTS.map(k=>[k,complete.some(d=>d.totals[k]==null)?null:complete.reduce((a,d)=>a+d.totals[k],0)/complete.length])):null;
- return {from,to,days,counts,completeDates:complete.map(d=>d.date),denominator:complete.length,average};
+ return {from,to,days,counts,completeDates:complete.map(d=>d.date),denominator:complete.length,emptyCompletedDays:days.filter(d=>d.status==='Complete'&&!d.intakeRecorded).length,average};
 }
 function minuteDifference(a,b){const diff=a-b;return Math.abs(diff)<=Number.EPSILON*Math.max(1,Math.abs(a),Math.abs(b))*4?0:diff;}
 export function cardioRolloverStart(s){return s.settings.cardioRolloverFrom??CARDIO_ROLLOVER_START;}
@@ -197,15 +206,15 @@ export function buildCheckin(s,d){
  const current=medianWindow(s.weights,d),prior=previous?.weight??medianWindow(s.weights,addDays(d,-7)),review=diaryReview(s,addDays(d,-7),addDays(d,-1));
  const cardio=cardioTotal(s,addDays(d,-1)),training=trainingWeek(s,addDays(d,-1)),stepTotals=s.stepTotals.filter(x=>x.date>=review.from&&x.date<=review.to),stepTargets=dates(review.from,review.to).map(date=>({date,target:clone(latest(s.stepTargets,date))}));
  const nextTarget=latest(s.cardioTargets,d),nextBudget=cardioTotal(s,d,{asOfDate:d});
- return {...stamp(),date:d,calculationVersion:'chris-v1',weight:current,previousWeight:clone(prior),change:change(prior.value,current.value),phase:clone(latest(s.phases,d)),review,reviewedPlans:dates(review.from,review.to).map(date=>({date,plan:clone(latest(s.plans,date))})),cardio:{...clone(cardio),targetVersions:clone(s.cardioTargets.filter(x=>x.effective<=review.to)),credits:clone(s.cardioCredits.filter(x=>x.date>=review.from&&x.date<=review.to))},training:clone(training),trainingSchedules:clone(s.trainingSchedules.filter(x=>x.effective<=review.to)),stepTargets,stepTotals:clone(stepTotals),nextPlan:clone(latest(s.plans.filter(p=>p.effective>=d),d)),nextCardio:clone(nextTarget),nextCardioRollover:{carriedIn:nextBudget.carriedIn,remainingAfterCredit:nextTarget?Math.max(0,-minuteDifference(nextBudget.carriedIn,nextTarget.weekly)):null,rolloverFrom:nextBudget.rolloverFrom},nextSteps:clone(latest(s.stepTargets,d))};
+ return {...stamp(),date:d,calculationVersion:'chris-v2-day-status',weight:current,previousWeight:clone(prior),change:change(prior.value,current.value),phase:clone(latest(s.phases,d)),review,reviewedPlans:dates(review.from,review.to).map(date=>({date,plan:clone(latest(s.plans,date))})),cardio:{...clone(cardio),targetVersions:clone(s.cardioTargets.filter(x=>x.effective<=review.to)),credits:clone(s.cardioCredits.filter(x=>x.date>=review.from&&x.date<=review.to))},training:clone(training),trainingSchedules:clone(s.trainingSchedules.filter(x=>x.effective<=review.to)),stepTargets,stepTotals:clone(stepTotals),nextPlan:clone(latest(s.plans.filter(p=>p.effective>=d),d)),nextCardio:clone(nextTarget),nextCardioRollover:{carriedIn:nextBudget.carriedIn,remainingAfterCredit:nextTarget?Math.max(0,-minuteDifference(nextBudget.carriedIn,nextTarget.weekly)):null,rolloverFrom:nextBudget.rolloverFrom},nextSteps:clone(latest(s.stepTargets,d))};
 }
 export function checkinText(c){
  const fmt=v=>v==null?'Unavailable':String(Math.round(v*100)/100),macro=p=>p?`${fmt(p.calories)} kcal; ${fmt(p.protein)} P (${p.band.join('–')} g band), ${fmt(p.carbs)} C, ${fmt(p.fat)} F`:'Unset';
  const med=w=>`${w.from}–${w.to}: ${fmt(w.value)} lb (${w.count}/7${w.count<7?', incomplete':''})`;
  const goal=p=>p?`${fmt(p.goal.value)} ${p.goal.unit}/week`:'Unset';
- const lines=[`CHECK-IN ${c.date} · ${c.phase?.phase??'Phase unset'}`,`This week median: ${med(c.weight)}`,`Previous week median: ${med(c.previousWeight)}`,`Change (this week minus previous): ${weightChangeText(c.previousWeight.value,c.weight.value)}${c.change?`; ${fmt(Math.abs(c.change.percent))}% ${c.change.loss>0?'loss':c.change.loss<0?'gain':'no change'}`:''}`,`Reviewed diary week: ${c.review.from}–${c.review.to}`,`Coverage: ${c.review.counts.Complete} Complete / ${c.review.counts.Unfinished} Unfinished / ${c.review.counts.Untracked} Untracked (of 7)`,`Average on ${c.review.denominator} Complete days [${c.review.completeDates.join(', ')}]: ${c.review.average?`${fmt(c.review.average.calories)} kcal; ${fmt(c.review.average.protein)} P, ${fmt(c.review.average.carbs)} C, ${fmt(c.review.average.fat)} F`:'Unavailable'}`,'Incomplete coverage cannot establish full-week intake.','REVIEWED TARGETS & GOALS'];
+ const lines=[`CHECK-IN ${c.date} · ${c.phase?.phase??'Phase unset'}`,`This week median: ${med(c.weight)}`,`Previous week median: ${med(c.previousWeight)}`,`Change (this week minus previous): ${weightChangeText(c.previousWeight.value,c.weight.value)}${c.change?`; ${fmt(Math.abs(c.change.percent))}% ${c.change.loss>0?'loss':c.change.loss<0?'gain':'no change'}`:''}`,`Reviewed diary week: ${c.review.from}–${c.review.to}`,c.calculationVersion==='chris-v1'?`Coverage: ${c.review.counts.Complete} Complete / ${c.review.counts.Unfinished} Unfinished / ${c.review.counts.Untracked} Untracked (of 7)`:`Coverage: ${c.review.counts.Complete} Completed / ${c.review.counts.Untracked} Untracked (of 7); ${c.review.emptyCompletedDays} empty Completed days excluded from averages`,`Average on ${c.review.denominator} ${c.calculationVersion==='chris-v1'?'Complete days':'Completed days with recorded intake'} [${c.review.completeDates.join(', ')}]: ${c.review.average?`${fmt(c.review.average.calories)} kcal; ${fmt(c.review.average.protein)} P, ${fmt(c.review.average.carbs)} C, ${fmt(c.review.average.fat)} F`:'Unavailable'}`,'Incomplete coverage cannot establish full-week intake.','REVIEWED TARGETS & GOALS'];
  for(const x of c.reviewedPlans)lines.push(`${x.date}: ${macro(x.plan)} · intended loss ${goal(x.plan)} · effective ${x.plan?.effective??'unset'}`);
- lines.push('DAILY BREAKDOWN');for(const d of c.review.days)lines.push(`${d.date} · ${fmt(d.weight)} lb · ${d.status} · ${d.status==='Untracked'?'intake unknown':`${d.status==='Unfinished'?'partial ':''}${fmt(d.totals.calories)} kcal; ${fmt(d.totals.protein)} P, ${fmt(d.totals.carbs)} C, ${fmt(d.totals.fat)} F`}`);
+ lines.push('DAILY BREAKDOWN');for(const d of c.review.days)lines.push(`${d.date} · ${fmt(d.weight)} lb · ${d.status==='Complete'&&c.calculationVersion!=='chris-v1'?'Completed':d.status} · ${d.intakeRecorded===false?'no intake logged':d.status==='Untracked'?'intake unknown':`${d.status==='Unfinished'?'partial ':''}${fmt(d.totals.calories)} kcal; ${fmt(d.totals.protein)} P, ${fmt(d.totals.carbs)} C, ${fmt(d.totals.fat)} F`}`);
  lines.push(`Training: ${c.training.filter(t=>t.completed).length}/${c.training.length} marked complete`);for(const t of c.training){lines.push(`${t.date} ${t.title}: ${t.completed?'Complete':'Not marked complete'}`);if(t.exercises?.length)lines.push('Exercises: '+t.exercises.map(e=>e.name).join(', '));}
  if(c.cardio.rolloverVersion){lines.push(`Cardio performed: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}`,`Cardio credit: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min credited; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Carried credit is not another performed session.`);}
  else lines.push(`Cardio: ${fmt(c.cardio.minutes)} / ${fmt(c.cardio.target?.weekly)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}; ${c.cardio.target?fmt(Math.abs(c.cardio.target.weekly-c.cardio.minutes))+(c.cardio.minutes>c.cardio.target.weekly?' extra':' remaining'):'target unset'}`);
@@ -237,7 +246,7 @@ export function validate(s){
  for(const e of [...s.entries,...s.plannedEntries]){assert(typeof e.name==='string'&&e.name.trim(),'Invalid entry name.');assert(/^([01]\d|2[0-3]):[0-5]\d$/.test(e.time),'Invalid entry time.');checkNum(e.quantity,'entry quantity',true);checkNutrition(e.nutrition);assert(e.snapshot&&typeof e.snapshot.name==='string','Missing historical food snapshot.');checkNutrition(e.snapshot.nutrition);validateFood(e.snapshot);const expected=portion(e.snapshot,e.quantity,e.unit);for(const k of NUTRIENTS)assert(expected.nutrition[k]===e.nutrition[k]||Math.abs(expected.nutrition[k]-e.nutrition[k])<1e-9,'Entry nutrition does not match its snapshot.');}
  const unique=(rows,key,label)=>{const keys=rows.map(key);assert(new Set(keys).size===keys.length,`Duplicate ${label}.`);};
  unique(s.weights,x=>x.date,'weight date');for(const w of s.weights)checkNum(w.lb,'weight',true);
- unique(s.statuses,x=>x.date,'diary status date');for(const r of s.statuses)assert(['Complete','Unfinished','Untracked'].includes(r.status),'Invalid diary status.');
+ unique(s.statuses,x=>x.date,'diary status date');for(const r of s.statuses)assert(['Complete','Untracked'].includes(r.status),'Invalid diary status.');for(const r of s.statuses)if(r.zeroIntakeConfirmed!==undefined)assert(typeof r.zeroIntakeConfirmed==='boolean','Invalid zero intake confirmation.');
  for(const p of s.plans){const expected=calculateTargets(p.calories,p.reference,p.overrides);for(const k of ['protein','fat','carbs','macroCalories'])assert(expected[k]===p[k],'Invalid saved macro calculation.');assert(JSON.stringify(expected.band)===JSON.stringify(p.band),'Invalid protein band.');checkNum(p.goal.value,'goal');assert(['lb','%'].includes(p.goal.unit),'Invalid authoritative goal unit.');assert(p.formula==='chris-v1-half-up','Unsupported target formula.');}
  for(const p of s.phases)assert(['Cut','Maintenance','Gain'].includes(p.phase),'Invalid phase.');
  for(const c of s.cardioTargets){checkNum(c.weekly,'weekly minutes');checkNum(c.days,'cardio days',true);assert(Number.isInteger(c.days)&&c.days<=7,'Cardio days must be 1–7.');checkNum(c.daily,'daily minutes');assert(Math.abs(c.daily*c.days-c.weekly)<1e-8,'Linked cardio values disagree.');assert(['daily','weekly'].includes(c.authority),'Missing cardio authority.');}
@@ -252,16 +261,19 @@ export function validate(s){
  for(const t of s.stepTargets)checkNum(t.target,'step target');unique(s.stepTotals,x=>x.date,'step total date');for(const t of s.stepTotals)assert(Number.isInteger(t.total)&&t.total>=0,'Invalid step total.');
  unique(s.favourites,x=>x.foodId,'favourite');for(const f of s.favourites)assert(s.foods.some(x=>x.id===f.foodId),'Favourite food is missing.');
  for(const c of s.checkins){
-  assert(c.calculationVersion==='chris-v1'&&weekStart(c.date)===c.date,'Invalid Sunday snapshot version/date.');
+  assert(['chris-v1','chris-v2-day-status'].includes(c.calculationVersion)&&weekStart(c.date)===c.date,'Invalid Sunday snapshot version/date.');
   const window=w=>{assert(w&&Array.isArray(w.weights),'Missing saved weight window.');date(w.from);date(w.to);assert(w.from===addDays(w.to,-6),'Invalid saved window dates.');assert(w.count===w.weights.length&&Number.isInteger(w.count)&&w.count>=0&&w.count<=7,'Invalid saved weigh-in count.');unique(w.weights,x=>x.date,'saved weight date');for(const x of w.weights){date(x.date);checkNum(x.lb,'saved weight',true);assert(x.date>=w.from&&x.date<=w.to,'Weight outside saved window.');}assert(medianWindow(w.weights,w.to).value===w.value,'Invalid saved median.');};
   window(c.weight);window(c.previousWeight);assert(c.weight.to===c.date&&c.previousWeight.to===addDays(c.date,-7),'Invalid comparison dates.');
   assert(c.review&&Array.isArray(c.review.days)&&c.review.days.length===7&&Array.isArray(c.review.completeDates),'Missing saved diary review.');assert(c.review.from===addDays(c.date,-7)&&c.review.to===addDays(c.date,-1),'Invalid diary review dates.');
-  assert(c.review.days.every((x,i)=>x.date===addDays(c.review.from,i)&&['Complete','Unfinished','Untracked'].includes(x.status)),'Invalid saved daily breakdown.');
-  for(const day of c.review.days)checkNutrition(day.totals);
-  for(const status of ['Complete','Unfinished','Untracked'])assert(c.review.counts?.[status]===c.review.days.filter(x=>x.status===status).length,'Invalid saved coverage.');
-  assert(c.review.denominator===c.review.counts.Complete&&JSON.stringify(c.review.completeDates)===JSON.stringify(c.review.days.filter(x=>x.status==='Complete').map(x=>x.date)),'Invalid average denominator.');
-  if(c.review.denominator===0)assert(c.review.average===null,'Averages must be unavailable without Complete days.');
-  else {assert(c.review.average,'Missing saved averages.');const complete=c.review.days.filter(x=>x.status==='Complete');for(const k of NUTRIENTS){const expected=complete.some(x=>x.totals[k]==null)?null:complete.reduce((a,x)=>a+x.totals[k],0)/complete.length;assert(c.review.average[k]===expected,'Invalid saved intake average.');}}
+  const legacy=c.calculationVersion==='chris-v1',statuses=legacy?['Complete','Unfinished','Untracked']:['Complete','Untracked'];
+  assert(c.review.days.every((x,i)=>x.date===addDays(c.review.from,i)&&statuses.includes(x.status)),'Invalid saved daily breakdown.');
+  for(const day of c.review.days){if(!legacy){assert(typeof day.intakeRecorded==='boolean','Missing saved intake availability.');if(!day.intakeRecorded){assert(NUTRIENTS.every(k=>day.totals[k]===null),'Empty intake cannot be stored as zero.');continue;}}checkNutrition(day.totals);}
+  for(const status of statuses)assert(c.review.counts?.[status]===c.review.days.filter(x=>x.status===status).length,'Invalid saved coverage.');
+  const completed=c.review.days.filter(x=>x.status==='Complete'&&(legacy||x.intakeRecorded));
+  if(!legacy)assert(c.review.emptyCompletedDays===c.review.days.filter(x=>x.status==='Complete'&&!x.intakeRecorded).length,'Invalid empty-day count.');
+  assert(c.review.denominator===completed.length&&JSON.stringify(c.review.completeDates)===JSON.stringify(completed.map(x=>x.date)),'Invalid average denominator.');
+  if(c.review.denominator===0)assert(c.review.average===null,'Averages must be unavailable without recorded Completed days.');
+  else {assert(c.review.average,'Missing saved averages.');for(const k of NUTRIENTS){const expected=completed.some(x=>x.totals[k]==null)?null:completed.reduce((a,x)=>a+x.totals[k],0)/completed.length;assert(c.review.average[k]===expected,'Invalid saved intake average.');}}
   assert(JSON.stringify(c.change)===JSON.stringify(change(c.previousWeight.value,c.weight.value)),'Invalid saved weight comparison.');
   assert(Array.isArray(c.reviewedPlans)&&Array.isArray(c.training)&&Array.isArray(c.stepTargets)&&Array.isArray(c.stepTotals)&&c.cardio&&Array.isArray(c.cardio.sessions)&&Array.isArray(c.cardio.targetVersions),'Incomplete saved activity/plan snapshot.');
   if(c.cardio.rolloverVersion!==undefined){

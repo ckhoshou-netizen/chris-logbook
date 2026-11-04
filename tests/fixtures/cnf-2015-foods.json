@@ -1,0 +1,362 @@
+[
+  {
+    "id": "cnf-2015-2241",
+    "createdAt": "2026-11-04T04:49:08Z",
+    "name": "Sweet potato, baked, skin removed after baking",
+    "brand": "",
+    "quantity": 100,
+    "unit": "g",
+    "grams": 100,
+    "nutrition": {
+      "calories": 90.0,
+      "protein": 2.01,
+      "carbs": 20.71,
+      "fat": 0.15,
+      "fibre": 3.3,
+      "sugar": 6.48,
+      "sodium": 36.0
+    },
+    "source": "Canadian Nutrient File",
+    "readOnly": true,
+    "archived": false,
+    "provenance": {
+      "dataset": "Canadian Nutrient File",
+      "version": "2015",
+      "foodId": "2241",
+      "foodCode": "2241",
+      "originalDescription": "Sweet potato, baked, skin removed after baking",
+      "originalDescriptionFr": "Patate douce, cuite au four, pelée après la cuisson",
+      "groupId": "11",
+      "group": "Vegetables and Vegetable Products",
+      "foodSourceId": "0",
+      "foodSource": "FOODS BASED ON DATA FROM USDA: NO CHANGES",
+      "foodDateOfEntry": "1985-01-01",
+      "foodDateOfPublication": "",
+      "basis": "100 g edible portion",
+      "nutrients": {
+        "calories": {
+          "id": "208",
+          "unit": "kCal",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "protein": {
+          "id": "203",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "carbs": {
+          "id": "205",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "fat": {
+          "id": "204",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "fibre": {
+          "id": "291",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "sugar": {
+          "id": "269",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2015-01-27"
+        },
+        "sodium": {
+          "id": "307",
+          "unit": "mg",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        }
+      }
+    },
+    "portions": [
+      {
+        "id": "139",
+        "label": "1 large",
+        "grams": 180.0,
+        "conversionFactor": "1.80000"
+      },
+      {
+        "id": "293",
+        "label": "1 medium (12.7cm x 5.1cm dia)",
+        "grams": 114.0,
+        "conversionFactor": "1.14000"
+      },
+      {
+        "id": "341",
+        "label": "100ml",
+        "grams": 84.531,
+        "conversionFactor": "0.84531"
+      },
+      {
+        "id": "383",
+        "label": "125ml",
+        "grams": 105.664,
+        "conversionFactor": "1.05664"
+      },
+      {
+        "id": "415",
+        "label": "250ml",
+        "grams": 211.327,
+        "conversionFactor": "2.11327"
+      },
+      {
+        "id": "553",
+        "label": "1 small",
+        "grams": 60.0,
+        "conversionFactor": "0.60000"
+      },
+      {
+        "id": "1482",
+        "label": "110g",
+        "grams": 110.0,
+        "conversionFactor": "1.10000"
+      },
+      {
+        "id": "1501",
+        "label": "1/2 medium",
+        "grams": 57.0,
+        "conversionFactor": "0.57000"
+      }
+    ]
+  },
+  {
+    "id": "cnf-2015-2242",
+    "createdAt": "2026-11-04T04:49:08Z",
+    "name": "Sweet potato, boiled without skin",
+    "brand": "",
+    "quantity": 100,
+    "unit": "g",
+    "grams": 100,
+    "nutrition": {
+      "calories": 77.0,
+      "protein": 1.37,
+      "carbs": 17.72,
+      "fat": 0.14,
+      "fibre": 2.5,
+      "sugar": 5.74,
+      "sodium": 27.0
+    },
+    "source": "Canadian Nutrient File",
+    "readOnly": true,
+    "archived": false,
+    "provenance": {
+      "dataset": "Canadian Nutrient File",
+      "version": "2015",
+      "foodId": "2242",
+      "foodCode": "2242",
+      "originalDescription": "Sweet potato, boiled without skin",
+      "originalDescriptionFr": "Patate douce, bouillie sans la pelure",
+      "groupId": "11",
+      "group": "Vegetables and Vegetable Products",
+      "foodSourceId": "0",
+      "foodSource": "FOODS BASED ON DATA FROM USDA: NO CHANGES",
+      "foodDateOfEntry": "1985-01-01",
+      "foodDateOfPublication": "",
+      "basis": "100 g edible portion",
+      "nutrients": {
+        "calories": {
+          "id": "208",
+          "unit": "kCal",
+          "sourceId": "4",
+          "dateOfEntry": "2010-05-21"
+        },
+        "protein": {
+          "id": "203",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "carbs": {
+          "id": "205",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "fat": {
+          "id": "204",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "fibre": {
+          "id": "291",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2004-03-31"
+        },
+        "sugar": {
+          "id": "269",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2003-11-05"
+        },
+        "sodium": {
+          "id": "307",
+          "unit": "mg",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        }
+      }
+    },
+    "portions": [
+      {
+        "id": "160",
+        "label": "1 medium",
+        "grams": 151.0,
+        "conversionFactor": "1.51000"
+      },
+      {
+        "id": "357",
+        "label": "100ml mashed",
+        "grams": 138.631,
+        "conversionFactor": "1.38631"
+      },
+      {
+        "id": "1059",
+        "label": "125ml mashed",
+        "grams": 173.288,
+        "conversionFactor": "1.73288"
+      },
+      {
+        "id": "1060",
+        "label": "250ml mashed",
+        "grams": 346.577,
+        "conversionFactor": "3.46577"
+      },
+      {
+        "id": "1482",
+        "label": "110g",
+        "grams": 110.0,
+        "conversionFactor": "1.10000"
+      },
+      {
+        "id": "1501",
+        "label": "1/2 medium",
+        "grams": 75.5,
+        "conversionFactor": "0.75500"
+      }
+    ]
+  },
+  {
+    "id": "cnf-2015-2240",
+    "createdAt": "2026-11-04T04:49:08Z",
+    "name": "Sweet potato, raw",
+    "brand": "",
+    "quantity": 100,
+    "unit": "g",
+    "grams": 100,
+    "nutrition": {
+      "calories": 86.0,
+      "protein": 1.57,
+      "carbs": 20.12,
+      "fat": 0.05,
+      "fibre": 3.0,
+      "sugar": 4.18,
+      "sodium": 55.0
+    },
+    "source": "Canadian Nutrient File",
+    "readOnly": true,
+    "archived": false,
+    "provenance": {
+      "dataset": "Canadian Nutrient File",
+      "version": "2015",
+      "foodId": "2240",
+      "foodCode": "2240",
+      "originalDescription": "Sweet potato, raw",
+      "originalDescriptionFr": "Patate douce, crue",
+      "groupId": "11",
+      "group": "Vegetables and Vegetable Products",
+      "foodSourceId": "0",
+      "foodSource": "FOODS BASED ON DATA FROM USDA: NO CHANGES",
+      "foodDateOfEntry": "1985-01-01",
+      "foodDateOfPublication": "",
+      "basis": "100 g edible portion",
+      "nutrients": {
+        "calories": {
+          "id": "208",
+          "unit": "kCal",
+          "sourceId": "0",
+          "dateOfEntry": "2005-04-05"
+        },
+        "protein": {
+          "id": "203",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "carbs": {
+          "id": "205",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2005-04-05"
+        },
+        "fat": {
+          "id": "204",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "fibre": {
+          "id": "291",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        },
+        "sugar": {
+          "id": "269",
+          "unit": "g",
+          "sourceId": "0",
+          "dateOfEntry": "2005-04-05"
+        },
+        "sodium": {
+          "id": "307",
+          "unit": "mg",
+          "sourceId": "0",
+          "dateOfEntry": "2009-07-02"
+        }
+      }
+    },
+    "portions": [
+      {
+        "id": "293",
+        "label": "1 medium (12.7cm x 5.1cm dia)",
+        "grams": 130.0,
+        "conversionFactor": "1.30000"
+      },
+      {
+        "id": "347",
+        "label": "100ml cubes",
+        "grams": 56.213,
+        "conversionFactor": "0.56213"
+      },
+      {
+        "id": "1015",
+        "label": "125ml cubes",
+        "grams": 70.266,
+        "conversionFactor": "0.70266"
+      },
+      {
+        "id": "1016",
+        "label": "250ml cubes",
+        "grams": 140.533,
+        "conversionFactor": "1.40533"
+      },
+      {
+        "id": "1482",
+        "label": "110g",
+        "grams": 110.0,
+        "conversionFactor": "1.10000"
+      }
+    ]
+  }
+]

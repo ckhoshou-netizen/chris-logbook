@@ -1,12 +1,12 @@
-Canadian Nutrient File, Health Canada, 2015.
+Canadian Nutrient File, Health Canada, 2026.
 
-The Canadian Nutrient File may be used for commercial and non-commercial use without further permission. The source copyright guidelines request due diligence in ensuring accuracy, preservation of nutrient values (conversion from the 100 g basis to other serving sizes is allowed), and identification of Health Canada as the source.
+This release uses public 2026 CNF tables published by Health Canada through the Government of Canada's Open Government Portal.
+Dataset: https://open.canada.ca/data/en/dataset/1b6139bd-ed7e-4043-bc28-ff00e10f3109
+Licence: Open Government Licence - Canada
+https://open.canada.ca/en/open-government-licence-canada
 
-The CNF is provided "as is" without warranty or condition of any kind, including implied warranties or conditions of merchantable quality and fitness for a particular purpose. Health Canada does not warrant that the CNF is error-free.
+The data is reproduced under that licence. This independent app is not an official version and is not affiliated with or endorsed by Health Canada or the Government of Canada. The data is supplied as is, without warranties; values are reference averages and are not medical advice.
 
-This app is an independent reproduction, not an official version, and is not affiliated with or endorsed by Health Canada. The CNF is a reference tool, not medical advice.
+Published nutrient amounts, units, identifiers, preparation descriptions and source references are retained. Only portion scaling and display rounding are applied. An edited copy is a separate Custom record.
 
-Government food profiles retain the published values. An edited custom copy is a separate Custom record and must not be represented as an unchanged government record.
-
-Source: CNF 2015 users' guide, Copyright Guidelines for the Canadian Nutrient File.
-https://www.canada.ca/en/health-canada/services/food-nutrition/healthy-eating/nutrient-data/canadian-nutrient-file-about-us.html
+Historical diary entries may retain CNF 2015 snapshots. Those source profiles remain labelled 2015 and unchanged. The 2015 copyright guidelines permit commercial and non-commercial use, ask for due diligence and Health Canada attribution, and allow conversion from a 100 g basis into other serving sizes while preserving the source nutrient values.

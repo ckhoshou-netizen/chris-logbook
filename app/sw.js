@@ -1,5 +1,5 @@
-const CACHE='chris-logbook-canadian-foods-v10';
-const FILES=['./','./index.html','./style.css','./main.mjs','./domain.mjs','./storage.mjs','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./fonts/BarlowCondensed-BoldItalic.ttf','./catalog.mjs','./data/cnf-2015.json'];
+const CACHE='chris-logbook-cnf2026-status-v11';
+const FILES=['./','./index.html','./style.css','./main.mjs','./domain.mjs','./storage.mjs','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./fonts/BarlowCondensed-BoldItalic.ttf','./catalog.mjs','./data/cnf-2026.json'];
 const ASSETS=new Set(FILES.map(path=>new URL(path,self.location.href).pathname));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(path=>new Request(new URL(path,self.location.href),{cache:'reload'}))))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('chris-logbook-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

@@ -4,7 +4,7 @@ let connection;
 export async function openStore(){
  if(connection)return connection;
  connection=await new Promise((resolve,reject)=>{
-  const request=indexedDB.open(DB,4);
+  const request=indexedDB.open(DB,5);
   let migrationError;
   request.onupgradeneeded=()=>{
    if(!request.result.objectStoreNames.contains(STORE)){request.result.createObjectStore(STORE);return;}

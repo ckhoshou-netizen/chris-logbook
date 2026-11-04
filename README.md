@@ -30,8 +30,12 @@ The app title uses Barlow Condensed Bold Italic, bundled locally under the SIL O
 
 ## Food logging and Canadian foods
 
-Add Food searches your own foods and 3,570 Canadian Nutrient File (2015) foods. Tap a result, enter the amount and tap Log Food. Recent foods reuse the last visible portion as a starting point. Date/time, source details, favourites and library editing are available under expandable options. New custom foods continue directly to their logging amount after saving. Future food remains planned until explicitly marked eaten.
+Add Food searches your own foods and 3,620 Canadian Nutrient File (2026) foods. Tap a result, enter the amount and tap Log Food. Recent foods reuse the last visible portion as a starting point. Date/time, source details, favourites and library editing are available under expandable options. New custom foods continue directly to their logging amount after saving. Future food remains planned until explicitly marked eaten.
 
-The complete catalogue is bundled locally and cached for offline search. Only foods referenced by logs or favourites are retained in the structured device backup. Every diary entry contains its own nutrition/provenance snapshot. The schema upgrades from v3 to v4 without recalculating or changing historical records. Earlier JSON backups remain readable.
+The complete catalogue is bundled locally and cached for offline search. Only foods referenced by logs or favourites are retained in the structured device backup. Every diary entry contains its own nutrition/provenance snapshot. Schema v5 upgrades earlier backups, changes live Unfinished day labels to Completed, and preserves saved entries, target history, check-ins and exported snapshots. Earlier JSON backups remain readable.
 
 For source selection, nutrient units, source energy, copyright notices, reproducible import commands and updating the catalogue, see [Food Data](docs/FOOD-DATA.md).
+
+Food Day Status now offers Completed (default) and Untracked. Empty defaults do not count as zero intake or dilute averages; Record Zero Intake is an optional explicit confirmation. See [Day Status](docs/DAY-STATUS.md) for migration and historical-review behavior.
+
+The usability pass places backup/restore first in Settings and weekly review before the weight chart; groups less-used workout actions; and keeps enlarged navigation clear of content and Undo.

@@ -1,0 +1,1046 @@
+{
+  "schemaVersion": 4,
+  "revision": 0,
+  "settings": {
+    "timezone": "America/Toronto",
+    "weightUnit": "lb",
+    "lastExport": null,
+    "cardioRolloverFrom": "2026-11-01"
+  },
+  "foods": [
+    {
+      "id": "7a4787d5-b55f-4561-8bd0-f653e7debd5c",
+      "createdAt": "2026-11-04T13:57:29.817Z",
+      "updatedAt": "2026-11-04T13:57:29.817Z",
+      "name": "Synthetic Cereal",
+      "brand": "",
+      "quantity": 40,
+      "unit": "g",
+      "grams": 40,
+      "nutrition": {
+        "calories": 160,
+        "protein": 4,
+        "carbs": 30,
+        "fat": 2,
+        "fibre": null,
+        "sugar": null,
+        "sodium": null
+      },
+      "source": "Custom",
+      "archived": false,
+      "household": "",
+      "barcode": ""
+    },
+    {
+      "id": "cnf-2015-2241",
+      "createdAt": "2026-11-04T04:49:08Z",
+      "name": "Sweet potato, baked, skin removed after baking",
+      "brand": "",
+      "quantity": 100,
+      "unit": "g",
+      "grams": 100,
+      "nutrition": {
+        "calories": 90,
+        "protein": 2.01,
+        "carbs": 20.71,
+        "fat": 0.15,
+        "fibre": 3.3,
+        "sugar": 6.48,
+        "sodium": 36
+      },
+      "source": "Canadian Nutrient File",
+      "readOnly": true,
+      "archived": false,
+      "provenance": {
+        "dataset": "Canadian Nutrient File",
+        "version": "2015",
+        "foodId": "2241",
+        "foodCode": "2241",
+        "originalDescription": "Sweet potato, baked, skin removed after baking",
+        "originalDescriptionFr": "Patate douce, cuite au four, pelée après la cuisson",
+        "groupId": "11",
+        "group": "Vegetables and Vegetable Products",
+        "foodSourceId": "0",
+        "foodSource": "FOODS BASED ON DATA FROM USDA: NO CHANGES",
+        "foodDateOfEntry": "1985-01-01",
+        "foodDateOfPublication": "",
+        "basis": "100 g edible portion",
+        "nutrients": {
+          "calories": {
+            "id": "208",
+            "unit": "kCal",
+            "sourceId": "0",
+            "dateOfEntry": "2004-03-31"
+          },
+          "protein": {
+            "id": "203",
+            "unit": "g",
+            "sourceId": "0",
+            "dateOfEntry": "2009-07-02"
+          },
+          "carbs": {
+            "id": "205",
+            "unit": "g",
+            "sourceId": "0",
+            "dateOfEntry": "2004-03-31"
+          },
+          "fat": {
+            "id": "204",
+            "unit": "g",
+            "sourceId": "0",
+            "dateOfEntry": "2004-03-31"
+          },
+          "fibre": {
+            "id": "291",
+            "unit": "g",
+            "sourceId": "0",
+            "dateOfEntry": "2004-03-31"
+          },
+          "sugar": {
+            "id": "269",
+            "unit": "g",
+            "sourceId": "0",
+            "dateOfEntry": "2015-01-27"
+          },
+          "sodium": {
+            "id": "307",
+            "unit": "mg",
+            "sourceId": "0",
+            "dateOfEntry": "2004-03-31"
+          }
+        }
+      },
+      "portions": [
+        {
+          "id": "139",
+          "label": "1 large",
+          "grams": 180,
+          "conversionFactor": "1.80000"
+        },
+        {
+          "id": "293",
+          "label": "1 medium (12.7cm x 5.1cm dia)",
+          "grams": 114,
+          "conversionFactor": "1.14000"
+        },
+        {
+          "id": "341",
+          "label": "100ml",
+          "grams": 84.531,
+          "conversionFactor": "0.84531"
+        },
+        {
+          "id": "383",
+          "label": "125ml",
+          "grams": 105.664,
+          "conversionFactor": "1.05664"
+        },
+        {
+          "id": "415",
+          "label": "250ml",
+          "grams": 211.327,
+          "conversionFactor": "2.11327"
+        },
+        {
+          "id": "553",
+          "label": "1 small",
+          "grams": 60,
+          "conversionFactor": "0.60000"
+        },
+        {
+          "id": "1482",
+          "label": "110g",
+          "grams": 110,
+          "conversionFactor": "1.10000"
+        },
+        {
+          "id": "1501",
+          "label": "1/2 medium",
+          "grams": 57,
+          "conversionFactor": "0.57000"
+        }
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "id": "75862720-216d-447e-8f1f-975a856f4b70",
+      "createdAt": "2026-11-04T13:57:29.818Z",
+      "date": "2026-10-25",
+      "time": "08:00",
+      "foodId": "7a4787d5-b55f-4561-8bd0-f653e7debd5c",
+      "name": "Synthetic Cereal",
+      "source": "Custom",
+      "snapshot": {
+        "id": "7a4787d5-b55f-4561-8bd0-f653e7debd5c",
+        "createdAt": "2026-11-04T13:57:29.817Z",
+        "updatedAt": "2026-11-04T13:57:29.817Z",
+        "name": "Synthetic Cereal",
+        "brand": "",
+        "quantity": 40,
+        "unit": "g",
+        "grams": 40,
+        "nutrition": {
+          "calories": 160,
+          "protein": 4,
+          "carbs": 30,
+          "fat": 2,
+          "fibre": null,
+          "sugar": null,
+          "sodium": null
+        },
+        "source": "Custom",
+        "archived": false,
+        "household": "",
+        "barcode": ""
+      },
+      "quantity": 40,
+      "unit": "g",
+      "nutrition": {
+        "calories": 160,
+        "protein": 4,
+        "carbs": 30,
+        "fat": 2,
+        "fibre": null,
+        "sugar": null,
+        "sodium": null
+      }
+    },
+    {
+      "id": "73fc4823-54e5-47ac-bec3-c316ecd88293",
+      "createdAt": "2026-11-04T13:57:29.819Z",
+      "date": "2026-10-26",
+      "time": "08:00",
+      "foodId": "7a4787d5-b55f-4561-8bd0-f653e7debd5c",
+      "name": "Synthetic Cereal",
+      "source": "Custom",
+      "snapshot": {
+        "id": "7a4787d5-b55f-4561-8bd0-f653e7debd5c",
+        "createdAt": "2026-11-04T13:57:29.817Z",
+        "updatedAt": "2026-11-04T13:57:29.817Z",
+        "name": "Synthetic Cereal",
+        "brand": "",
+        "quantity": 40,
+        "unit": "g",
+        "grams": 40,
+        "nutrition": {
+          "calories": 160,
+          "protein": 4,
+          "carbs": 30,
+          "fat": 2,
+          "fibre": null,
+          "sugar": null,
+          "sodium": null
+        },
+        "source": "Custom",
+        "archived": false,
+        "household": "",
+        "barcode": ""
+      },
+      "quantity": 40,
+      "unit": "g",
+      "nutrition": {
+        "calories": 160,
+        "protein": 4,
+        "carbs": 30,
+        "fat": 2,
+        "fibre": null,
+        "sugar": null,
+        "sodium": null
+      }
+    },
+    {
+      "id": "41adaa03-b68b-4ddd-86b5-d0fd64281582",
+      "createdAt": "2026-11-04T13:57:29.827Z",
+      "date": "2026-11-03",
+      "time": "12:00",
+      "foodId": "cnf-2015-2241",
+      "name": "Sweet potato, baked, skin removed after baking",
+      "source": "Canadian Nutrient File",
+      "snapshot": {
+        "id": "cnf-2015-2241",
+        "createdAt": "2026-11-04T04:49:08Z",
+        "name": "Sweet potato, baked, skin removed after baking",
+        "brand": "",
+        "quantity": 100,
+        "unit": "g",
+        "grams": 100,
+        "nutrition": {
+          "calories": 90,
+          "protein": 2.01,
+          "carbs": 20.71,
+          "fat": 0.15,
+          "fibre": 3.3,
+          "sugar": 6.48,
+          "sodium": 36
+        },
+        "source": "Canadian Nutrient File",
+        "readOnly": true,
+        "archived": false,
+        "provenance": {
+          "dataset": "Canadian Nutrient File",
+          "version": "2015",
+          "foodId": "2241",
+          "foodCode": "2241",
+          "originalDescription": "Sweet potato, baked, skin removed after baking",
+          "originalDescriptionFr": "Patate douce, cuite au four, pelée après la cuisson",
+          "groupId": "11",
+          "group": "Vegetables and Vegetable Products",
+          "foodSourceId": "0",
+          "foodSource": "FOODS BASED ON DATA FROM USDA: NO CHANGES",
+          "foodDateOfEntry": "1985-01-01",
+          "foodDateOfPublication": "",
+          "basis": "100 g edible portion",
+          "nutrients": {
+            "calories": {
+              "id": "208",
+              "unit": "kCal",
+              "sourceId": "0",
+              "dateOfEntry": "2004-03-31"
+            },
+            "protein": {
+              "id": "203",
+              "unit": "g",
+              "sourceId": "0",
+              "dateOfEntry": "2009-07-02"
+            },
+            "carbs": {
+              "id": "205",
+              "unit": "g",
+              "sourceId": "0",
+              "dateOfEntry": "2004-03-31"
+            },
+            "fat": {
+              "id": "204",
+              "unit": "g",
+              "sourceId": "0",
+              "dateOfEntry": "2004-03-31"
+            },
+            "fibre": {
+              "id": "291",
+              "unit": "g",
+              "sourceId": "0",
+              "dateOfEntry": "2004-03-31"
+            },
+            "sugar": {
+              "id": "269",
+              "unit": "g",
+              "sourceId": "0",
+              "dateOfEntry": "2015-01-27"
+            },
+            "sodium": {
+              "id": "307",
+              "unit": "mg",
+              "sourceId": "0",
+              "dateOfEntry": "2004-03-31"
+            }
+          }
+        },
+        "portions": [
+          {
+            "id": "139",
+            "label": "1 large",
+            "grams": 180,
+            "conversionFactor": "1.80000"
+          },
+          {
+            "id": "293",
+            "label": "1 medium (12.7cm x 5.1cm dia)",
+            "grams": 114,
+            "conversionFactor": "1.14000"
+          },
+          {
+            "id": "341",
+            "label": "100ml",
+            "grams": 84.531,
+            "conversionFactor": "0.84531"
+          },
+          {
+            "id": "383",
+            "label": "125ml",
+            "grams": 105.664,
+            "conversionFactor": "1.05664"
+          },
+          {
+            "id": "415",
+            "label": "250ml",
+            "grams": 211.327,
+            "conversionFactor": "2.11327"
+          },
+          {
+            "id": "553",
+            "label": "1 small",
+            "grams": 60,
+            "conversionFactor": "0.60000"
+          },
+          {
+            "id": "1482",
+            "label": "110g",
+            "grams": 110,
+            "conversionFactor": "1.10000"
+          },
+          {
+            "id": "1501",
+            "label": "1/2 medium",
+            "grams": 57,
+            "conversionFactor": "0.57000"
+          }
+        ]
+      },
+      "quantity": 60,
+      "unit": "g",
+      "nutrition": {
+        "calories": 54,
+        "protein": 1.2059999999999997,
+        "carbs": 12.426,
+        "fat": 0.09,
+        "fibre": 1.9799999999999998,
+        "sugar": 3.888,
+        "sodium": 21.599999999999998
+      }
+    }
+  ],
+  "weights": [
+    {
+      "id": "2cfea73d-33eb-4062-ae85-dfd43743c6da",
+      "createdAt": "2026-11-04T13:57:29.824Z",
+      "date": "2026-10-25",
+      "lb": 134
+    },
+    {
+      "id": "2c7e390d-18d3-4137-a12c-9cbcc3a7e4c1",
+      "createdAt": "2026-11-04T13:57:29.825Z",
+      "date": "2026-11-01",
+      "lb": 132
+    }
+  ],
+  "statuses": [
+    {
+      "id": "49f4e685-92f9-430b-b8c4-4464d231ac4f",
+      "createdAt": "2026-11-04T13:57:29.820Z",
+      "date": "2026-10-25",
+      "status": "Complete"
+    },
+    {
+      "id": "fdf81473-09d4-4b79-a285-8d4193bd27e5",
+      "createdAt": "2026-11-04T13:57:29.821Z",
+      "date": "2026-10-26",
+      "status": "Unfinished"
+    },
+    {
+      "id": "b38fb66c-9d88-4a94-a355-7f81f07f2713",
+      "createdAt": "2026-11-04T13:57:29.822Z",
+      "date": "2026-10-27",
+      "status": "Untracked"
+    },
+    {
+      "id": "4ae62ed2-fb85-4cdb-9450-f284798a2a41",
+      "createdAt": "2026-11-04T13:57:29.823Z",
+      "date": "2026-10-28",
+      "status": "Complete"
+    }
+  ],
+  "plans": [
+    {
+      "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+      "createdAt": "2026-11-04T13:57:29.826Z",
+      "effective": "2026-10-25",
+      "calories": 1800,
+      "reference": 132,
+      "protein": 132,
+      "fat": 43,
+      "carbs": 221,
+      "band": [
+        130,
+        135
+      ],
+      "macroCalories": 1799,
+      "overrides": {},
+      "formula": "chris-v1-half-up",
+      "goal": {
+        "value": 1,
+        "unit": "lb"
+      },
+      "referenceWindow": null
+    }
+  ],
+  "phases": [],
+  "checkins": [
+    {
+      "id": "0faf1d50-b82a-4b3b-8406-3a73287145da",
+      "createdAt": "2026-11-04T13:57:29.838Z",
+      "date": "2026-11-01",
+      "calculationVersion": "chris-v1",
+      "weight": {
+        "from": "2026-10-26",
+        "to": "2026-11-01",
+        "count": 1,
+        "value": 132,
+        "weights": [
+          {
+            "id": "2c7e390d-18d3-4137-a12c-9cbcc3a7e4c1",
+            "createdAt": "2026-11-04T13:57:29.825Z",
+            "date": "2026-11-01",
+            "lb": 132
+          }
+        ]
+      },
+      "previousWeight": {
+        "from": "2026-10-19",
+        "to": "2026-10-25",
+        "count": 1,
+        "value": 134,
+        "weights": [
+          {
+            "id": "2cfea73d-33eb-4062-ae85-dfd43743c6da",
+            "createdAt": "2026-11-04T13:57:29.824Z",
+            "date": "2026-10-25",
+            "lb": 134
+          }
+        ]
+      },
+      "change": {
+        "loss": 2,
+        "percent": 1.4925373134328357
+      },
+      "phase": null,
+      "review": {
+        "from": "2026-10-25",
+        "to": "2026-10-31",
+        "days": [
+          {
+            "date": "2026-10-25",
+            "status": "Complete",
+            "weight": 134,
+            "totals": {
+              "calories": 160,
+              "protein": 4,
+              "carbs": 30,
+              "fat": 2,
+              "fibre": null,
+              "sugar": null,
+              "sodium": null
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-26",
+            "status": "Unfinished",
+            "weight": null,
+            "totals": {
+              "calories": 160,
+              "protein": 4,
+              "carbs": 30,
+              "fat": 2,
+              "fibre": null,
+              "sugar": null,
+              "sodium": null
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-27",
+            "status": "Untracked",
+            "weight": null,
+            "totals": {
+              "calories": 0,
+              "protein": 0,
+              "carbs": 0,
+              "fat": 0,
+              "fibre": 0,
+              "sugar": 0,
+              "sodium": 0
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-28",
+            "status": "Complete",
+            "weight": null,
+            "totals": {
+              "calories": 0,
+              "protein": 0,
+              "carbs": 0,
+              "fat": 0,
+              "fibre": 0,
+              "sugar": 0,
+              "sodium": 0
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-29",
+            "status": "Unfinished",
+            "weight": null,
+            "totals": {
+              "calories": 0,
+              "protein": 0,
+              "carbs": 0,
+              "fat": 0,
+              "fibre": 0,
+              "sugar": 0,
+              "sodium": 0
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-30",
+            "status": "Unfinished",
+            "weight": null,
+            "totals": {
+              "calories": 0,
+              "protein": 0,
+              "carbs": 0,
+              "fat": 0,
+              "fibre": 0,
+              "sugar": 0,
+              "sodium": 0
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          },
+          {
+            "date": "2026-10-31",
+            "status": "Unfinished",
+            "weight": null,
+            "totals": {
+              "calories": 0,
+              "protein": 0,
+              "carbs": 0,
+              "fat": 0,
+              "fibre": 0,
+              "sugar": 0,
+              "sodium": 0
+            },
+            "plan": {
+              "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+              "createdAt": "2026-11-04T13:57:29.826Z",
+              "effective": "2026-10-25",
+              "calories": 1800,
+              "reference": 132,
+              "protein": 132,
+              "fat": 43,
+              "carbs": 221,
+              "band": [
+                130,
+                135
+              ],
+              "macroCalories": 1799,
+              "overrides": {},
+              "formula": "chris-v1-half-up",
+              "goal": {
+                "value": 1,
+                "unit": "lb"
+              },
+              "referenceWindow": null
+            }
+          }
+        ],
+        "counts": {
+          "Complete": 2,
+          "Unfinished": 4,
+          "Untracked": 1
+        },
+        "completeDates": [
+          "2026-10-25",
+          "2026-10-28"
+        ],
+        "denominator": 2,
+        "average": {
+          "calories": 80,
+          "protein": 2,
+          "carbs": 15,
+          "fat": 1,
+          "fibre": null,
+          "sugar": null,
+          "sodium": null
+        }
+      },
+      "reviewedPlans": [
+        {
+          "date": "2026-10-25",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-26",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-27",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-28",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-29",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-30",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        },
+        {
+          "date": "2026-10-31",
+          "plan": {
+            "id": "171a6f0a-b9d5-4764-af64-f70c2a653041",
+            "createdAt": "2026-11-04T13:57:29.826Z",
+            "effective": "2026-10-25",
+            "calories": 1800,
+            "reference": 132,
+            "protein": 132,
+            "fat": 43,
+            "carbs": 221,
+            "band": [
+              130,
+              135
+            ],
+            "macroCalories": 1799,
+            "overrides": {},
+            "formula": "chris-v1-half-up",
+            "goal": {
+              "value": 1,
+              "unit": "lb"
+            },
+            "referenceWindow": null
+          }
+        }
+      ],
+      "cardio": {
+        "from": "2026-10-25",
+        "to": "2026-10-31",
+        "sessions": [],
+        "minutes": 0,
+        "target": null,
+        "carriedIn": 0,
+        "creditedMinutes": 0,
+        "remaining": null,
+        "carryOut": 0,
+        "rolloverEnabled": false,
+        "rolloverVersion": "surplus-v1",
+        "rolloverFrom": "2026-11-01",
+        "asOfDate": "2026-11-04",
+        "rolloverHistory": [],
+        "targetVersions": [],
+        "credits": []
+      },
+      "training": [],
+      "trainingSchedules": [],
+      "stepTargets": [
+        {
+          "date": "2026-10-25",
+          "target": null
+        },
+        {
+          "date": "2026-10-26",
+          "target": null
+        },
+        {
+          "date": "2026-10-27",
+          "target": null
+        },
+        {
+          "date": "2026-10-28",
+          "target": null
+        },
+        {
+          "date": "2026-10-29",
+          "target": null
+        },
+        {
+          "date": "2026-10-30",
+          "target": null
+        },
+        {
+          "date": "2026-10-31",
+          "target": null
+        }
+      ],
+      "stepTotals": [],
+      "nextPlan": null,
+      "nextCardio": null,
+      "nextCardioRollover": {
+        "carriedIn": 0,
+        "remainingAfterCredit": null,
+        "rolloverFrom": "2026-11-01"
+      },
+      "nextSteps": null
+    }
+  ],
+  "exportedSnapshots": [
+    {
+      "id": "a80c97ca-9d41-4010-a322-9c149a344ee0",
+      "createdAt": "2026-11-04T13:57:29.839Z",
+      "checkinId": "0faf1d50-b82a-4b3b-8406-3a73287145da",
+      "text": "CHECK-IN 2026-11-01 · Phase unset\nThis week median: 2026-10-26–2026-11-01: 132 lb (1/7, incomplete)\nPrevious week median: 2026-10-19–2026-10-25: 134 lb (1/7, incomplete)\nChange (this week minus previous): −2.0 lb; 1.49% loss\nReviewed diary week: 2026-10-25–2026-10-31\nCoverage: 2 Complete / 4 Unfinished / 1 Untracked (of 7)\nAverage on 2 Complete days [2026-10-25, 2026-10-28]: 80 kcal; 2 P, 15 C, 1 F\nIncomplete coverage cannot establish full-week intake.\nREVIEWED TARGETS & GOALS\n2026-10-25: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-26: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-27: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-28: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-29: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-30: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\n2026-10-31: 1800 kcal; 132 P (130–135 g band), 221 C, 43 F · intended loss 1 lb/week · effective 2026-10-25\nDAILY BREAKDOWN\n2026-10-25 · 134 lb · Complete · 160 kcal; 4 P, 30 C, 2 F\n2026-10-26 · Unavailable lb · Unfinished · partial 160 kcal; 4 P, 30 C, 2 F\n2026-10-27 · Unavailable lb · Untracked · intake unknown\n2026-10-28 · Unavailable lb · Complete · 0 kcal; 0 P, 0 C, 0 F\n2026-10-29 · Unavailable lb · Unfinished · partial 0 kcal; 0 P, 0 C, 0 F\n2026-10-30 · Unavailable lb · Unfinished · partial 0 kcal; 0 P, 0 C, 0 F\n2026-10-31 · Unavailable lb · Unfinished · partial 0 kcal; 0 P, 0 C, 0 F\nTraining: 0/0 marked complete\nCardio performed: 0 min; 0 sessions; category unset\nCardio credit: 0 min carried in; 0 / Unavailable min credited; Unavailable min remaining; 0 min carry forward. Carried credit is not another performed session.\nStep target 2026-10-25: Unavailable (effective unset)\nStep target 2026-10-26: Unavailable (effective unset)\nStep target 2026-10-27: Unavailable (effective unset)\nStep target 2026-10-28: Unavailable (effective unset)\nStep target 2026-10-29: Unavailable (effective unset)\nStep target 2026-10-30: Unavailable (effective unset)\nStep target 2026-10-31: Unavailable (effective unset)\nNEXT SAVED PLAN\nNext plan not yet set\nNext cardio: Unset\nNext cardio credit: 0 min carried in; Unavailable min target left before new sessions. Rollover starts 2026-11-01.\nNext daily step target: Unavailable · effective unset"
+    }
+  ],
+  "cardioTargets": [],
+  "cardioSessions": [],
+  "cardioCredits": [],
+  "trainingSchedules": [],
+  "trainingOccurrences": [],
+  "stepTargets": [],
+  "stepTotals": [],
+  "favourites": [
+    {
+      "id": "f16d0bed-f382-4744-914c-d304794f90a6",
+      "createdAt": "2026-11-04T13:57:29.828Z",
+      "foodId": "cnf-2015-2241"
+    }
+  ],
+  "plannedEntries": [],
+  "exercises": []
+}

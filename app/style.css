@@ -296,3 +296,28 @@ textarea{width:100%}.split-row{border-bottom:1px solid var(--line);padding-botto
 .entry-more{margin:0}.entry-more summary{min-height:44px;padding:8px 2px;font-size:.9375rem}
 .entry-more>div{display:flex;gap:24px;flex-wrap:wrap}
 form[data-form="portion"]>.primary{margin-top:20px;margin-bottom:24px}
+
+/* Usability pass: keep frequent actions visible and move infrequent detail out of the main flow. */
+.page-heading{margin-bottom:24px}
+.page-heading+.weight-card{padding-top:4px;margin-top:0}
+.workout-tools{display:flex;align-items:flex-start;gap:12px 24px;flex-wrap:wrap;margin-left:38px}
+.workout-tools .workout-reference,.workout-more{margin:0}
+.workout-tools summary{min-height:44px;padding-block:8px;font-size:.9375rem}
+.workout-tools details[open]{flex-basis:100%}
+.workout-tools ol{padding-left:20px}
+.day-slot{min-width:0}.day-mark{font-size:1rem;overflow-wrap:anywhere;min-height:2.25rem}
+.settings-data>.caption{margin-block:12px 20px}
+.settings-actions{display:grid;gap:12px;margin-block:20px}
+.settings-options{border-top:1px solid var(--line);padding-top:8px;margin-top:12px}
+.settings-links{display:flex;gap:12px 24px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:16px;padding-top:12px}
+
+.diary-status{grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr));gap:12px 16px}
+main{padding-bottom:calc(var(--nav-height,96px) + 32px)}
+html{scroll-padding-block:20px calc(var(--nav-height,96px) + 24px)}
+button,a,input,select,textarea,summary{scroll-margin-block:20px calc(var(--nav-height,96px) + 24px)}
+#toast{bottom:calc(var(--nav-height,84px) + 16px)}
+
+.training-item:last-child{border-bottom:0;padding-bottom:0}
+.step-card{border-bottom:0}
+.goals-card{border-bottom:0;padding-bottom:24px}
+.checkin-review{margin-top:0}
