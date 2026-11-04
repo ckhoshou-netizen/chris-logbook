@@ -186,12 +186,16 @@ export function saveExercise(s,input,exerciseId=null){
  const exercise=makeExercise(input,previous);assert(!s.exercises.some(x=>x.id!==exercise.id&&!x.archived&&x.name.toLowerCase()===exercise.name.toLowerCase()),'An active exercise already has that name.');
  s.exercises=s.exercises.filter(x=>x.id!==exercise.id);s.exercises.push(exercise);return exercise;
 }
+function setCount(value){
+ if(value===''||value==null)return undefined;
+ const sets=number(value,'Sets');assert(Number.isSafeInteger(sets),'Sets must be a whole number, zero or greater.');return sets;
+}
 export function saveTrainingSplit(s,effective,days){
  date(effective);assert(Array.isArray(days),'Choose workout days.');
  const prepared=days.map(day=>{
   assert(typeof day.title==='string'&&day.title.trim(),'Every workout needs a title.');assert(Number.isInteger(day.weekday)&&day.weekday>=0&&day.weekday<=6,'Choose a valid weekday.');
   const ids=(day.exercises??[]).map(x=>typeof x==='string'?x:x.id);assert(new Set(ids).size===ids.length,'An exercise is listed twice in this workout.');
-  const exercises=ids.map(id=>{const exercise=s.exercises.find(e=>e.id===id);assert(exercise,'An assigned exercise no longer exists.');const assigned=latest(s.trainingSchedules,effective)?.days.find(x=>x.id===day.id)?.exercises?.some(x=>x.id===id);assert(!exercise.archived||assigned,'Restore an archived exercise before assigning it to a new workout.');return {id:exercise.id,name:exercise.name};});
+  const exercises=ids.map((id,index)=>{const exercise=s.exercises.find(e=>e.id===id);assert(exercise,'An assigned exercise no longer exists.');const assigned=latest(s.trainingSchedules,effective)?.days.find(x=>x.id===day.id)?.exercises?.find(x=>x.id===id);assert(!exercise.archived||assigned,'Restore an archived exercise before assigning it to a new workout.');const input=day.exercises[index],sets=setCount(typeof input==='string'?assigned?.sets:input.sets);return {id:exercise.id,name:exercise.name,...(sets===undefined?{}:{sets})};});
   return {id:day.id||id(),weekday:day.weekday,title:day.title.trim(),exercises};
  });
  assert(new Set(prepared.map(x=>x.id)).size===prepared.length,'Duplicate workout identity.');
@@ -200,14 +204,14 @@ export function saveTrainingSplit(s,effective,days){
 function workoutIdentity(t){return t.workoutId??t.key.split(':')[1];}
 export function trainingWeek(s,d,currentDate=today(s.settings.timezone)){
  const from=weekStart(d),to=addDays(from,6),out=[];
- const reference=t=>!t.completed&&t.date>=currentDate&&t.exercises?.length?{...t,exercises:t.exercises.map(e=>({id:e.id,name:s.exercises.find(x=>x.id===e.id)?.name??e.name}))}:t;
+ const reference=t=>!t.completed&&t.date>=currentDate&&t.exercises?.length?{...t,exercises:t.exercises.map(e=>({...e,name:s.exercises.find(x=>x.id===e.id)?.name??e.name}))}:t;
  for(const day of dates(from,to)){
   const schedule=latest(s.trainingSchedules,day),weekday=new Date(day+'T12:00:00Z').getUTCDay();
   for(const item of schedule?.days??[]){
    if(item.weekday!==weekday)continue;
    const key=`${schedule.id}:${item.id}:${day}`;
    const saved=s.trainingOccurrences.find(x=>x.key===key||x.originalDate===day&&workoutIdentity(x)===item.id);
-   const exercises=(item.exercises??[]).map(e=>({id:e.id,name:day>=currentDate?(s.exercises.find(x=>x.id===e.id)?.name??e.name):e.name}));
+   const exercises=(item.exercises??[]).map(e=>({...e,name:day>=currentDate?(s.exercises.find(x=>x.id===e.id)?.name??e.name):e.name}));
    out.push(saved?reference(saved):{id:key,key,date:day,originalDate:day,title:item.title,scheduleId:schedule.id,workoutId:item.id,exercises,completed:false});
   }
  }
@@ -289,7 +293,7 @@ export function checkinText(c){
  for(const x of c.reviewedPlans){const g=c.reviewedWeightGoals?.find(y=>y.date===x.date)?.goal;lines.push(`${x.date}: ${macro(x.plan)} · intended loss ${g?`${fmt(g.lossPerWeek)} lb/week`:goal(x.plan)} · effective ${x.plan?.effective??'unset'}`);}
  if(c.reviewedWeightGoals)for(const g of c.reviewedWeightGoals.map(x=>x.goal).filter((g,i,a)=>g&&a.findIndex(x=>x?.id===g.id)===i))lines.push(`Reviewed weight goal: ${deadline(g)}`);
  lines.push('DAILY BREAKDOWN');for(const d of c.review.days)lines.push(`${d.date} · ${fmt(d.weight)} lb · ${d.status==='Complete'&&c.calculationVersion!=='chris-v1'?'Completed':d.status} · ${d.intakeRecorded===false?'no intake logged':d.status==='Untracked'?'intake unknown':`${d.status==='Unfinished'?'partial ':''}${fmt(d.totals.calories)} kcal; ${fmt(d.totals.protein)} P, ${fmt(d.totals.carbs)} C, ${fmt(d.totals.fat)} F`}`);
- lines.push(`Training: ${c.training.filter(t=>t.completed).length}/${c.training.length} marked complete`);for(const t of c.training){lines.push(`${t.date} ${t.title}: ${t.completed?'Complete':'Not marked complete'}`);if(t.exercises?.length)lines.push('Exercises: '+t.exercises.map(e=>e.name).join(', '));}
+ lines.push(`Training: ${c.training.filter(t=>t.completed).length}/${c.training.length} marked complete`);for(const t of c.training){lines.push(`${t.date} ${t.title}: ${t.completed?'Complete':'Not marked complete'}`);if(t.exercises?.length)lines.push('Exercises: '+t.exercises.map(e=>e.name+(e.sets!=null?` (${e.sets} ${e.sets===1?'set':'sets'})`:'')).join(', '));}
  if(c.cardio.rolloverVersion==='saved-minutes-v2'){lines.push(`Cardio entered: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} entries; ${c.cardio.target?.category??'category unset'}`,`Cardio total: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Includes saved future-dated minutes; carried credit is not another entry.`);}
  else if(c.cardio.rolloverVersion){lines.push(`Cardio performed: ${fmt(c.cardio.minutes)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}`,`Cardio credit: ${fmt(c.cardio.carriedIn)} min carried in; ${fmt(c.cardio.creditedMinutes)} / ${fmt(c.cardio.target?.weekly)} min credited; ${fmt(c.cardio.remaining)} min remaining; ${fmt(c.cardio.carryOut)} min carry forward. Carried credit is not another performed session.`);}
  else lines.push(`Cardio: ${fmt(c.cardio.minutes)} / ${fmt(c.cardio.target?.weekly)} min; ${c.cardio.sessions.length} sessions; ${c.cardio.target?.category??'category unset'}; ${c.cardio.target?fmt(Math.abs(c.cardio.target.weekly-c.cardio.minutes))+(c.cardio.minutes>c.cardio.target.weekly?' extra':' remaining'):'target unset'}`);
@@ -345,7 +349,7 @@ export function validate(s){
  unique(s.cardioCredits,x=>x.sessionId+':'+x.date,'cardio credit');
  for(const c of s.cardioCredits){checkNum(c.minutes,'credited minutes',true);const session=s.cardioSessions.find(x=>x.id===c.sessionId);assert(session?.completed&&weekStart(session.date)===weekStart(c.date),'Credit must reference a performed session in the same week.');}
  for(const x of s.cardioSessions)assert(s.cardioCredits.filter(c=>c.sessionId===x.id).reduce((a,c)=>a+c.minutes,0)<=x.minutes+1e-9,'Credits exceed performed minutes.');
- const checkExercises=items=>{assert(Array.isArray(items),'Invalid assigned exercises.');unique(items,x=>x.id,'assigned exercise');for(const e of items)assert(typeof e.id==='string'&&e.id&&typeof e.name==='string'&&e.name.trim(),'Invalid exercise snapshot.');};
+ const checkExercises=items=>{assert(Array.isArray(items),'Invalid assigned exercises.');unique(items,x=>x.id,'assigned exercise');for(const e of items){assert(typeof e.id==='string'&&e.id&&typeof e.name==='string'&&e.name.trim(),'Invalid exercise snapshot.');if(e.sets!==undefined)assert(Number.isSafeInteger(e.sets)&&e.sets>=0,'Invalid exercise set count.');}};
  for(const e of s.exercises)assert(typeof e.name==='string'&&e.name.trim()&&typeof e.archived==='boolean','Invalid exercise library record.');
  for(const schedule of s.trainingSchedules){assert(Array.isArray(schedule.days),'Missing split days.');unique(schedule.days,x=>x.id,'workout ID');for(const d of schedule.days){assert(Number.isInteger(d.weekday)&&d.weekday>=0&&d.weekday<=6&&typeof d.title==='string'&&d.title.trim(),'Invalid training day.');if(d.exercises!==undefined)checkExercises(d.exercises);}}
  unique(s.trainingOccurrences,x=>x.key,'training occurrence');for(const t of s.trainingOccurrences){assert(typeof t.key==='string'&&t.key&&typeof t.title==='string'&&t.title.trim()&&typeof t.completed==='boolean','Invalid workout.');date(t.originalDate);assert(weekStart(t.date)===weekStart(t.originalDate),'Move workouts within the same week.');assert(s.trainingSchedules.some(x=>x.id===t.scheduleId),'Missing historical training schedule.');if(t.exercises!==undefined)checkExercises(t.exercises);}

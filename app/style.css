@@ -170,7 +170,7 @@ details.split-row{margin:0;padding:0;border-bottom:1px solid var(--line)}
 .split-workout-body{padding:0 0 20px}
 .split-workout-body .form-grid{grid-template-columns:1fr;margin:8px 0 24px}
 .split-workout-body input[name="title"]{padding-right:11px}
-.split-workout-body .assigned-list{margin:8px 0 20px;padding-left:22px}
+.split-workout-body .assigned-list{margin:8px 0 20px;padding-left:22px;list-style-position:outside}
 .split-workout-body .assigned-list>li{padding:12px 0;line-height:1.5}
 .exercise-actions{margin:4px 0 0}
 .exercise-actions>summary{font-size:.875rem;padding-block:8px;min-height:44px}
@@ -402,3 +402,9 @@ button,a,input,select,textarea,summary{scroll-margin-block:20px calc(var(--nav-h
 .cardio-day>span:first-child{display:block}
 .cardio-day:hover:enabled{background:var(--surface)}
 .cardio-day:disabled{cursor:default;opacity:.65}
+
+.assigned-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.assigned-heading>.exercise-name{min-width:0;flex:1}
+.exercise-sets{flex:0 0 auto;width:5rem;max-width:42%;min-width:0;font-size:.875rem}
+.exercise-sets input{display:block;width:100%;padding:8px;margin-top:4px;min-height:44px}
+.exercise-set-summary{color:var(--muted)}
