@@ -259,3 +259,10 @@ textarea{width:100%}.split-row{border-bottom:1px solid var(--line);padding-botto
 .checkin-review[open]>summary{margin-bottom:24px}
 .checkin-review>label{margin-top:24px}
 @media(forced-colors:active){.bottom-nav a[aria-current]{border:2px solid ButtonText}}
+
+/* Keep goal units together and give the saved reference its own line. */
+.goal-rate{white-space:nowrap}
+.goal-reference{display:grid;gap:4px;margin-block:16px}
+.goals-card .stat-list .row{flex-wrap:wrap;gap:8px 16px}
+.goals-card .stat-list dt{flex:1 1 12rem}
+.goals-card .stat-list dd{flex:0 0 auto;text-align:left}

@@ -1,4 +1,4 @@
-const CACHE='chris-logbook-three-tabs-v7';
+const CACHE='chris-logbook-goal-spacing-v8';
 const FILES=['./','./index.html','./style.css','./main.mjs','./domain.mjs','./storage.mjs','./manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png'];
 const ASSETS=new Set(FILES.map(path=>new URL(path,self.location.href).pathname));
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES.map(path=>new Request(new URL(path,self.location.href),{cache:'reload'}))))));
