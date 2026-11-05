@@ -2,6 +2,14 @@
 
 An independent iPhone Home Screen web app. It requires no ChatGPT subscription, ChatGPT login, paid AI API or server database.
 
+## Local presentation overhaul
+
+Run `node scripts/serve.mjs` from this folder and open `http://127.0.0.1:4173`. The preview stays on your computer. Its records use the local preview address; they are separate from records at the published address.
+
+Nutrition, Training and Check-in now share a graphite and ice-blue presentation system, responsive cards, icon navigation and brief transitions. Tabs remember their scroll position, disclosures stay open during saves, progress bars continue through refreshes, and editable controls keep at least 16px text. Reduced motion disables page, progress, sheet, backdrop and toast effects. The 24-hour food timeline, calculations, storage schema and backup format are preserved.
+
+See [Presentation Audit](docs/PRESENTATION-AUDIT.md) for findings, validation and the remaining iPhone checks. The optional browser audit uses synthetic records in fresh, isolated browser contexts; it never visits or edits the published app. With Playwright available, start the preview server and run `node scripts/audit-presentation.mjs`. Edge is the default; `BROWSER_ENGINE=webkit` selects an installed Playwright WebKit browser, and `BROWSER_CHANNEL=chrome` selects Chrome. Reports and screenshots go to the ignored `audit-output/` folder. `PLAYWRIGHT_MODULE`, `AUDIT_URL` and `AUDIT_OUTPUT` can override the library path and local audit addresses. Publication uses the existing main-branch GitHub Pages workflow following explicit user authorization.
+
 ## Hosting
 
 This repository is prepared for GitHub Pages on the main branch. Enable Pages with GitHub Actions as the build source; the workflow publishes only app/. Public app files and repository code contain no personal records or credentials. Hosting remains subject to GitHub's current plan terms and usage limits. The app is served at https://ckhoshou-netizen.github.io/chris-logbook/. Changes pushed to main are published by the included workflow.

@@ -1,5 +1,5 @@
 import vm from 'node:vm';import fs from 'node:fs';import * as Domain from '../app/domain.mjs';import * as Catalog from '../app/catalog.mjs';
-const source=fs.readFileSync(new URL('../app/main.mjs',import.meta.url),'utf8').replace(/^import .*\n/gm,'').replace(/\nstart\(\);\s*$/,'');
+const source=fs.readFileSync(new URL('../app/main.mjs',import.meta.url),'utf8').replace(/\r\n/g,'\n').replace(/^import .*\n/gm,'').replace(/\nstart\(\);\s*$/,'');
 export function ui(s,d='2026-11-04',clock='2026-11-03'){
  const listeners={},nodes=new Map();
  const node=key=>{if(!nodes.has(key))nodes.set(key,{innerHTML:'',textContent:'',dataset:{},setAttribute(){},open:false,value:'',scrollTop:0,style:{setProperty(){}},classList:{values:new Set(),add(k){this.values.add(k);},remove(k){this.values.delete(k);},contains(k){return this.values.has(k);},toggle(k,on){if(on)this.values.add(k);else this.values.delete(k);}},querySelector(){return null;},querySelectorAll(){return [];},insertAdjacentHTML(position,html){this.innerHTML+=html;},addEventListener(){},showModal(){this.open=true;},close(){this.open=false;},focus(){}});return nodes.get(key);};

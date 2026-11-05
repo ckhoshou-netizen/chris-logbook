@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#171b20">
+  <meta name="theme-color" content="#101418">
   <meta name="color-scheme" content="dark">
   <title>Road to the Stage</title>
+  <link rel="preload" href="fonts/BarlowCondensed-BoldItalic.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon-192.png">
@@ -17,15 +18,15 @@
 <body>
   <a class="skip-link" href="#screen">Skip to content</a>
   <div class="app-shell">
-    <header class="app-header"><a class="wordmark" href="#nutrition">Road to the Stage</a><button class="text-button" data-action="settings">Settings</button></header>
+    <header class="app-header"><a class="wordmark" href="#nutrition">Road to the Stage</a><button class="settings-button" data-action="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9.5 3-.7 2.2-2 .9-2.2-.5-2.5 4.3 1.5 1.7v2.3l-1.5 1.7 2.5 4.3 2.2-.5 2 .9.7 2.2h5l.7-2.2 2-.9 2.2.5 2.5-4.3-1.5-1.7v-2.3l1.5-1.7-2.5-4.3-2.2.5-2-.9L14.5 3z" transform="translate(1 0) scale(.92)"/><circle cx="12" cy="12" r="3.2"/></svg></button></header>
     <main id="screen" tabindex="-1"><p role="status">Opening your logbook…</p></main>
     <nav class="bottom-nav" aria-label="Main navigation">
-      <a href="#nutrition" data-tab="nutrition">Nutrition</a>
-      <a href="#training" data-tab="training">Training</a>
-      <a href="#checkin" data-tab="checkin">Check-in</a>
+      <a href="#nutrition" data-tab="nutrition"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v6a3 3 0 0 0 6 0V3M7 3v18M20 21V3c-4 2-5 7-5 10h5"/></svg><span>Nutrition</span></a>
+      <a href="#training" data-tab="training"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7v10M3 9v6M17 7v10M21 9v6M7 12h10M3 12h4m10 0h4"/></svg><span>Training</span></a>
+      <a href="#checkin" data-tab="checkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16M8 14l4-5 4 3 4-7"/></svg><span>Check-in</span></a>
     </nav>
   </div>
   <dialog id="sheet" aria-labelledby="sheet-title"><div class="sheet-header"><button type="button" id="sheet-back" class="sheet-back" hidden>‹</button><h2 id="sheet-title" tabindex="-1"></h2><button class="text-button" id="close-sheet">Cancel</button></div><div id="sheet-content"></div><div id="sheet-footer" hidden></div></dialog>
-  <div id="toast" role="status" hidden></div>
+  <div id="toast" role="status" aria-atomic="true" hidden></div>
 </body>
 </html>

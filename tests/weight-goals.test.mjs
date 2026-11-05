@@ -60,5 +60,5 @@ test('v5 device upgrade and complete JSON restore retain all records, older save
 });
 test('Check-in prioritizes goal weight and deadline, keeps food targets accessible, and never writes while viewing',()=>{
  const s=fixture();save(s);const before=D.clone(s),{api}=ui(s,'2026-11-04','2026-11-04'),html=api.checkinScreen();
- assert.match(html,/Weight Goal/);assert.match(html,/130 lb/);assert.match(html,/By Sunday, Dec 13, 2026/);assert.match(html,/0.97 lb\/week/);assert.match(html,/Edit Weight Goal/);assert.match(html,/<details class="calorie-targets" >.*Calories & Macros/);assert.match(html,/2,000/);assert.deepEqual(s,before);
+ assert.match(html,/Weight Goal/);assert.match(html,/130 lb/);assert.match(html,/By Sunday, Dec 13, 2026/);assert.match(html,/0.97 lb\/week/);assert.match(html,/Edit Weight Goal/);assert.match(html,/<details class="calorie-targets"[^>]*><summary>Calories & Macros/);assert.doesNotMatch(html,/<details class="calorie-targets"[^>]*\bopen\b/);assert.match(html,/2,000/);assert.deepEqual(s,before);
 });
