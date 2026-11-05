@@ -38,3 +38,7 @@ Cardio retains the previously simplified tap-day → Minutes → Update flow, in
 The browser walkthrough exercised food addition/editing/planning, custom foods, quick add, target edits, fractional/future cardio, steps, workout movement/completion, inline exercise creation, weight editing, saved-report copy, date validation, clean-store JSON restore and offline reopen. It compared every restored collection with the exported backup and checked that older plans, check-ins and exports stayed unchanged.
 
 Responsive checks used 320, 390 and 430 px widths, normal/200% text, and a 460 px keyboard-sized viewport. Controls retain visible focus, new buttons have at least 44 px tap height, primary form actions stay reachable, and closing a sheet restores the page position and action focus. These are automated Chromium checks with touch emulation; actual iPhone Safari/Home Screen behavior still needs Chris's device verification.
+
+## iPhone date-picker correction — 5 November 2026
+
+Day/week arrows now update the selected date without programmatically focusing the native date input, which was opening its calendar on iPhone. The calendar remains available by tapping the date itself. Selecting a date no longer refocuses and reopens the picker. Regression tests cover both directions on Nutrition, Training and Check-in, including calendar stepping across the daylight-saving boundary and unchanged stored records.

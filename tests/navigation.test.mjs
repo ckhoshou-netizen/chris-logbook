@@ -26,3 +26,21 @@ test('opening Check-in from a future food plan keeps weight entry on an actual c
  await api.action('weight');assert.match(node('#sheet-content').innerHTML,/name="date"[^>]*value="2026-11-03"/);
  await assert.rejects(()=>api.submit('weight-date',{values:{date:'2026-11-04'}}),/past date/);assert.deepEqual(s,before);
 });
+for(const [mode,start,step,expected] of [
+ ['nutrition','2026-10-31',1,'2026-11-01'],
+ ['training','2026-10-31',7,'2026-11-07'],
+ ['checkin','2026-11-04',1,'2026-11-05'],
+])test(`${mode} arrow changes the calendar date without focusing the iPhone date picker or changing records`,async()=>{
+ const s=fixture(),before=structuredClone(s),{api,node,context}=ui(s,start,'2026-11-05');context.location.hash='#'+mode;
+ let dateFocus=0;node(`[data-day-date="${mode}"]`).focus=()=>dateFocus++;
+ context.document.activeElement={dataset:{action:'day-step',value:`${mode}:${step}`}};
+ await api.action('day-step',`${mode}:${step}`);
+ assert.match(node('#screen').innerHTML,new RegExp(`data-day-date="${mode}" value="${expected}"`));assert.equal(dateFocus,0);assert.deepEqual(s,before);
+ await api.action('day-step',`${mode}:${-step}`);
+ assert.match(node('#screen').innerHTML,new RegExp(`data-day-date="${mode}" value="${start}"`));assert.equal(dateFocus,0);assert.deepEqual(s,before);
+});
+test('choosing a calendar date commits it without refocusing or reopening the picker',async()=>{
+ const s=fixture(),before=structuredClone(s),{node,listeners}=ui(s,'2026-11-04','2026-11-05');let dateFocus=0;node('[data-day-date="nutrition"]').focus=()=>dateFocus++;
+ await listeners.change({target:{dataset:{dayDate:'nutrition'},value:'2026-11-02',closest:()=>null}});
+ assert.match(node('#screen').innerHTML,/data-day-date="nutrition" value="2026-11-02"/);assert.equal(dateFocus,0);assert.deepEqual(s,before);
+});

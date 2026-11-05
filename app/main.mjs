@@ -65,7 +65,8 @@ function dateNav(mode,d){
  const step=mode==='training'?7:1,unit=step===7?'week':'day',next=D.addDays(d,step),limited=mode==='checkin';
  return `<div class="date-nav" aria-label="${mode==='training'?'Training week':'Diary date'}">${button('‹','day-step',mode+':-'+step,'date-arrow','Previous '+unit)}<label class="native-date"><span class="sr-only">${mode==='checkin'?'Weight Date':mode==='training'?'Training Date':'Diary Date'}</span><input type="date" data-day-date="${mode}" value="${d}" ${limited?`max="${now()}"`:''}></label><button type="button" class="date-arrow" data-action="day-step" data-value="${mode}:${step}" aria-label="Next ${unit}" ${limited&&next>now()?'disabled':''}>›</button></div>`;
 }
-function viewDate(d,mode){D.date(d);D.assert(mode!=='checkin'||d<=now(),'Choose today or a past date for weights.');selectedDate=d;render();document.querySelector(`[data-day-date="${mode}"]`)?.focus({preventScroll:true});}
+// Focusing a native date input opens its picker on iPhone; arrows must only change the date.
+function viewDate(d,mode){D.date(d);D.assert(mode!=='checkin'||d<=now(),'Choose today or a past date for weights.');selectedDate=d;render();}
 function nutritionScreen(){
  const isFuture=selectedDate>now(),actual=state.entries.filter(e=>e.date===selectedDate),pending=state.plannedEntries.filter(e=>e.date===selectedDate),entries=isFuture?pending:actual,tot=D.totals(entries),plan=planAt(selectedDate),status=D.dayStatus(state,selectedDate),remaining=plan?plan.calories-tot.calories:null;
  const timeline=[...actual.map(e=>({...e,isPlanned:false})),...pending.map(e=>({...e,isPlanned:true}))].sort((a,b)=>a.time.localeCompare(b.time)||a.createdAt.localeCompare(b.createdAt));
